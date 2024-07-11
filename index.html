@@ -1,314 +1,368 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alcanza Tu Ritmo Ideal</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            padding: 10px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alcanza Tu Ritmo Ideal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      padding: 10px;
+    }
 
-        .container {
-            text-align: center;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
+    .container {
+      text-align: center;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
 
-        .container img {
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 20px;
-        }
+    .container img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
 
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
 
-        input[type="number"] {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+    input[type="number"] {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
 
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-        .start-btn { background-color: green; }
-        .pause-btn { background-color: orange; }
-        .stop-btn { background-color: red; }
-        .export-btn { background-color: blue; }
-        .calculate-btn { background-color: purple; }
-        .reset-btn { background-color: gray; }
+    .start-btn { background-color: green; }
+    .pause-btn { background-color: orange; }
+    .stop-btn { background-color: red; }
+    .export-btn { background-color: blue; }
+    .calculate-btn { background-color: purple; }
+    .reset-btn { background-color: gray; }
 
-        .button-row {
-            display: flex;
-            justify-content: space-between;
-        }
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+    }
 
-        .button-row button {
-            width: 48%;
-        }
+    .button-row button {
+      width: 48%;
+    }
 
-        .time-inputs {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
+    .time-inputs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
 
-        .time-inputs div {
-            width: 48%;
-        }
+    .time-inputs div {
+      width: 48%;
+    }
 
-        #map {
-            height: 300px;
-            width: 100%;
-            margin-top: 20px;
-        }
+    #map {
+      height: 300px;
+      width: 100%;
+      margin-top: 20px;
+    }
 
-        .achieved { color: green; }
-        .not-achieved { color: red; }
-    </style>
+    .achieved { color: green; }
+    .not-achieved { color: red; }
+
+    /* Estilo para el tamaño del texto de "By Diego Valdés" */
+    .container h2 {
+      font-size: 0.8em; /* Tamaño más pequeño */
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <img src="C:/Users/diego.valdes/OneDrive - office365tl/VISUAL STUDIO CODE/imagenes/PORTADA.jpg" alt="Portada de la app">
-        <h1 style="font-size: 1.5em;">Alcanza Tu Ritmo Ideal</h1>
-        <h1 style="font-size: 1.5em;">By Diego Valdés</h1>
-        <div>
-            <label for="distanciaObjetivo">Distancia Objetivo (Km):</label>
-            <input type="number" id="distanciaObjetivo" min="0" step="0.01">
-        </div>
-        <div class="time-inputs">
-            <div>
-                <label for="tiempoObjetivoHoras">Tiempo Objetivo (Hrs):</label>
-                <input type="number" id="tiempoObjetivoHoras" min="0" step="1">
-            </div>
-            <div>
-                <label for="tiempoObjetivoMinutos">Tiempo Objetivo (Min):</label>
-                <input type="number" id="tiempoObjetivoMinutos" min="0" step="1">
-            </div>
-        </div>
-        <button class="calculate-btn" onclick="calcularRitmo()">Calcular Ritmo</button>
-        <div id="ritmoObjetivo"></div>
-        
-        <div class="button-row">
-            <button class="start-btn" onclick="iniciarCarrera()">Iniciar Carrera</button>
-            <button class="pause-btn" onclick="pausarCarrera()">Pausar Carrera</button>
-        </div>
-        <button class="stop-btn" onclick="finalizarCarrera()">Finalizar Carrera</button>
-        <button class="export-btn" onclick="exportarGPX()">Exportar tu Ruta GPX</button>
-        <button class="reset-btn" onclick="nuevaCarrera()">Nueva Carrera</button>
-
-        <div id="feedback"></div>
-        <div id="map"></div>
+  <div class="container">
+    <img src="C:/Users/diego.valdes/OneDrive - office365tl/VISUAL STUDIO CODE/imagenes/PORTADA.jpg" alt="Portada de la app">
+    <h1 style="font-size: 1.5em;">Alcanza Tu Ritmo Ideal</h1>
+    <h2 style="font-size: 1em;">By Diego Valdés</h2> <!-- Ajuste de tamaño de texto -->
+    <!-- Agregar el nuevo botón -->
+    <button onclick="mostrarRitmosPorKm()">Analizar tus ritmos por kilómetro</button>
+    <div>
+      <label for="distanciaObjetivo">Distancia Objetivo (Km):</label>
+      <input type="number" id="distanciaObjetivo" min="0" step="0.01">
     </div>
+    <div class="time-inputs">
+      <div>
+        <label for="tiempoObjetivoHoras">Tiempo Objetivo (Hrs):</label>
+        <input type="number" id="tiempoObjetivoHoras" min="0" step="1">
+      </div>
+      <div>
+        <label for="tiempoObjetivoMinutos">Tiempo Objetivo (Min):</label>
+        <input type="number" id="tiempoObjetivoMinutos" min="0" step="1">
+      </div>
+    </div>
+    <button class="calculate-btn" onclick="calcularRitmo()">Calcular Ritmo</button>
+    <div id="ritmoObjetivo"></div>
+    
+    <div class="button-row">
+      <button class="start-btn" onclick="iniciarCarrera()">Iniciar Carrera</button>
+      <button class="pause-btn" onclick="pausarCarrera()">Pausar Carrera</button>
+    </div>
+    <button class="stop-btn" onclick="finalizarCarrera()">Finalizar Carrera</button>
+    <button class="export-btn" onclick="exportarGPX()">Exportar tu Ruta GPX</button>
+    <button class="reset-btn" onclick="nuevaCarrera()">Nueva Carrera</button>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&callback=initMap" async defer></script>
-    <script>
-        let map, marker, path;
-        let startTime, endTime, timerInterval;
-        let distanciaRecorrida = 0;
-        let watchID;
-        let isPaused = false;
-        let pausedTime, pausedDuration = 0;
-        let kmMarkers = [];
-        let caloriasQuemadas = 0;
-        const CALORIAS_POR_KM = 60;
+    <div id="feedback"></div>
+    <div id="map"></div>
+  </div>
 
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: -34.397, lng: 150.644 },
-                zoom: 15,
-            });
-            marker = new google.maps.Marker({
-                map: map,
-                title: 'Tu ubicación actual',
-            });
-            path = new google.maps.Polyline({
-                map: map,
-                path: [],
-                geodesic: true,
-                strokeColor: '#FF0000',
-                strokeOpacity: 1.0,
-                strokeWeight: 2,
-            });
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&callback=initMap" async defer></script>
+  <script>
+    let map, marker, path;
+    let startTime, endTime, timerInterval;
+    let distanciaRecorrida = 0;
+    let watchID;
+    let isPaused = false;
+    let pausedTime, pausedDuration = 0;
+    let kmMarkers = [];
+    let caloriasQuemadas = 0;
+    const CALORIAS_POR_KM = 60;
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: -34.397, lng: 150.644 },
+        zoom: 15,
+      });
+      marker = new google.maps.Marker({
+        map: map,
+        title: 'Tu ubicación actual',
+      });
+      path = new google.maps.Polyline({
+        map: map,
+        path: [],
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+      });
+    }
+
+    function iniciarCarrera() {
+      if (navigator.geolocation) {
+        if (!isPaused) {
+          startTime = new Date();
+          distanciaRecorrida = 0;
+          caloriasQuemadas = 0;
+          document.getElementById('feedback').innerHTML = "";
+        } else {
+          pausedDuration += (new Date() - pausedTime);
         }
+        isPaused = false;
+        watchID = navigator.geolocation.watchPosition(updateLocation, handleError, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        });
+        timerInterval = setInterval(updateFeedback, 1000);
+      } else {
+        alert("La geolocalización no es soportada por este navegador.");
+      }
+    }
 
-        function iniciarCarrera() {
-            if (navigator.geolocation) {
-                if (!isPaused) {
-                    startTime = new Date();
-                    distanciaRecorrida = 0;
-                    caloriasQuemadas = 0;
-                    document.getElementById('feedback').innerHTML = "";
-                } else {
-                    pausedDuration += (new Date() - pausedTime);
-                }
-                isPaused = false;
-                watchID = navigator.geolocation.watchPosition(updateLocation, handleError, {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0,
-                });
-                timerInterval = setInterval(updateFeedback, 1000);
-            } else {
-                alert("La geolocalización no es soportada por este navegador.");
-            }
+    function pausarCarrera() {
+      if (!isPaused) {
+        clearInterval(timerInterval);
+        if (navigator.geolocation) {
+          navigator.geolocation.clearWatch(watchID);
         }
+        pausedTime = new Date();
+        isPaused = true;
+      }
+    }
 
-        function pausarCarrera() {
-            if (!isPaused) {
-                clearInterval(timerInterval);
-                if (navigator.geolocation) {
-                    navigator.geolocation.clearWatch(watchID);
-                }
-                pausedTime = new Date();
-                isPaused = true;
-            }
+    function finalizarCarrera() {
+      endTime = new Date();
+      clearInterval(timerInterval);
+      if (navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchID);
+      }
+      mostrarResultados();
+    }
+
+    function updateLocation(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      const currentPosition = new google.maps.LatLng(lat, lng);
+      marker.setPosition(currentPosition);
+      map.setCenter(currentPosition);
+
+      const pathArray = path.getPath();
+      pathArray.push(currentPosition);
+      path.setPath(pathArray);
+
+      if (pathArray.getLength() > 1) {
+        const prevPos = pathArray.getAt(pathArray.getLength() - 2);
+        const distance = google.maps.geometry.spherical.computeDistanceBetween(prevPos, currentPosition);
+        distanciaRecorrida += distance / 1000;
+
+        if (Math.floor(distanciaRecorrida) > kmMarkers.length) {
+          const kmMarker = new google.maps.Marker({
+            position: currentPosition,
+            map: map,
+            label: `${kmMarkers.length + 1} km`,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 5,
+              fillColor: '#00F',
+              fillOpacity: 1,
+              strokeWeight: 1,
+            },
+          });
+          kmMarkers.push(kmMarker);
         }
+      }
+    }
 
-        function finalizarCarrera() {
-            endTime = new Date();
-            clearInterval(timerInterval);
-            if (navigator.geolocation) {
-                navigator.geolocation.clearWatch(watchID);
-            }
-            mostrarResultados();
-        }
+    function handleError(error) {
+      console.error("Error en la geolocalización: ", error);
+    }
 
-        function updateLocation(position) {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const currentPosition = new google.maps.LatLng(lat, lng);
-            marker.setPosition(currentPosition);
-            map.setCenter(currentPosition);
+    function updateFeedback() {
+      let currentTime = new Date();
+      let elapsedTime = ((currentTime - startTime - pausedDuration) / 1000);
+      let ritmoPromedio = (elapsedTime / 60) / distanciaRecorrida;
+      caloriasQuemadas = distanciaRecorrida * CALORIAS_POR_KM;
 
-            const pathArray = path.getPath();
-            pathArray.push(currentPosition);
-            path.setPath(pathArray);
+      document.getElementById('feedback').innerHTML = `
+        <p>Ritmo actual: ${(ritmoPromedio).toFixed(2)} min/km</p>
+        <p>Distancia Recorrida: ${(distanciaRecorrida).toFixed(2)} km</p>
+        <p>Calorías quemadas: ${caloriasQuemadas.toFixed(2)}</p>
+      `;
+    }
 
-            if (pathArray.getLength() > 1) {
-                const prevPos = pathArray.getAt(pathArray.getLength() - 2);
-                const distance = google.maps.geometry.spherical.computeDistanceBetween(prevPos, currentPosition);
-                distanciaRecorrida += distance / 1000;
+    function mostrarResultados() {
+      let tiempoTranscurrido = (endTime - startTime - pausedDuration) / 1000;
+      let ritmoObjetivo = calcularRitmoObjetivo(tiempoTranscurrido);
+      let distanciaObjetivo = document.getElementById('distanciaObjetivo').value || 0;
 
-                if (Math.floor(distanciaRecorrida) > kmMarkers.length) {
-                    const kmMarker = new google.maps.Marker({
-                        position: currentPosition,
-                        map: map,
-                        label: `${kmMarkers.length + 1} km`,
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 5,
-                            fillColor: '#00F',
-                            fillOpacity: 1,
-                            strokeWeight: 1,
-                        },
-                    });
-                    kmMarkers.push(kmMarker);
-                }
-            }
-        }
+      document.getElementById('feedback').innerHTML += `
+        <h3>Resultados</h3>
+        <p>Tiempo total: ${formatTime(tiempoTranscurrido)}</p>
+        <p>Ritmo promedio: ${ritmoObjetivo}</p>
+      `;
 
-        function handleError(error) {
-            console.error("Error en la geolocalización: ", error);
-        }
+      if (distanciaRecorrida >= distanciaObjetivo) {
+        document.getElementById('feedback').innerHTML += `<p class="achieved">Objetivo alcanzado!</p>`;
+      } else {
+        document.getElementById('feedback').innerHTML += `<p class="not-achieved">Objetivo no alcanzado.</p>`;
+      }
+    }
 
-        function updateFeedback() {
-            let currentTime = new Date();
-            let elapsedTime = ((currentTime - startTime - pausedDuration) / 1000);
-            let ritmoPromedio = (elapsedTime / 60) / distanciaRecorrida;
-            caloriasQuemadas = distanciaRecorrida * CALORIAS_POR_KM;
+    function calcularRitmoObjetivo(tiempoTranscurrido) {
+      let distanciaObjetivo = document.getElementById('distanciaObjetivo').value || 0;
+      let horasObjetivo = parseInt(document.getElementById('tiempoObjetivoHoras').value) || 0;
+      let minutosObjetivo = parseInt(document.getElementById('tiempoObjetivoMinutos').value) || 0;
+      let tiempoObjetivo = horasObjetivo * 3600 + minutosObjetivo * 60;
+      let ritmoObjetivo = tiempoObjetivo / (distanciaObjetivo);
 
-            document.getElementById('feedback').innerHTML = `
-                <p>Ritmo actual: ${(ritmoPromedio).toFixed(2)} min/km</p>
-                <p>Distancia Recorrida: ${(distanciaRecorrida).toFixed(2)} km</p>
-                <p>Calorías Quemadas: ${caloriasQuemadas.toFixed(2)} kcal</p>
-                <p>Tiempo Transcurrido: ${Math.floor(elapsedTime / 3600)} hrs, ${Math.floor((elapsedTime % 3600) / 60)} mins, ${Math.floor(elapsedTime % 60)} segs</p>
-            `;
-        }
+      return `${Math.floor(ritmoObjetivo / 60)}:${Math.floor(ritmoObjetivo % 60)}`;
+    }
 
-        function calcularRitmo() {
-            let distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
-            let tiempoObjetivoHoras = parseInt(document.getElementById('tiempoObjetivoHoras').value) || 0;
-            let tiempoObjetivoMinutos = parseInt(document.getElementById('tiempoObjetivoMinutos').value) || 0;
-            let tiempoObjetivo = (tiempoObjetivoHoras * 60) + tiempoObjetivoMinutos;
-            let ritmoObjetivo = tiempoObjetivo / distanciaObjetivo;
-            
-            document.getElementById('ritmoObjetivo').innerHTML = `
-                <p>Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km</p>
-            `;
-        }
+    function formatTime(segundos) {
+      let horas = Math.floor(segundos / 3600);
+      segundos %= 3600;
+      let minutos = Math.floor(segundos / 60);
+      segundos %= 60;
 
-        function mostrarResultados() {
-            let distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
-            let tiempoObjetivoHoras = parseInt(document.getElementById('tiempoObjetivoHoras').value) || 0;
-            let tiempoObjetivoMinutos = parseInt(document.getElementById('tiempoObjetivoMinutos').value) || 0;
-            let tiempoObjetivo = (tiempoObjetivoHoras * 60) + tiempoObjetivoMinutos;
-            let tiempoTranscurrido = ((endTime - startTime - pausedDuration) / 1000) / 60; // En minutos
+      return `${horas}h ${minutos}m ${segundos}s`;
+    }
 
-            let ritmoPromedio = (tiempoTranscurrido) / distanciaRecorrida;
-            let logroDistancia = distanciaRecorrida >= distanciaObjetivo ? "Cumplido" : "No Cumplido";
-            let logroTiempo = tiempoTranscurrido <= tiempoObjetivo ? "Cumplido" : "No Cumplido";
+    function exportarGPX() {
+      let gpxData = `
+        <?xml version="1.0" encoding="UTF-8"?>
+        <gpx version="1.1" creator="Tu Aplicación de Running" xmlns="http://www.topografix.com/GPX/1/1">
+          <trk>
+            <name>Recorrido de carrera</name>
+            <trkseg>
+      `;
 
-            let feedback = `
-                <p>Ritmo promedio: ${(ritmoPromedio).toFixed(2)} min/km</p>
-                <p>Distancia Recorrida: ${(distanciaRecorrida).toFixed(2)} km</p>
-                <p>Calorías Quemadas: ${caloriasQuemadas.toFixed(2)} kcal</p>
-                <p>Tiempo Transcurrido: ${Math.floor(tiempoTranscurrido / 60)} hrs, ${Math.floor(tiempoTranscurrido % 60)} mins</p>
-                <p class="${logroDistancia === 'Cumplido' ? 'achieved' : 'not-achieved'}">Distancia Objetivo: ${logroDistancia}</p>
-                <p class="${logroTiempo === 'Cumplido' ? 'achieved' : 'not-achieved'}">Tiempo Objetivo: ${logroTiempo}</p>
-            `;
-            document.getElementById('feedback').innerHTML = feedback;
-        }
+      const pathArray = path.getPath();
+      pathArray.forEach(point => {
+        gpxData += `
+          <trkpt lat="${point.lat()}" lon="${point.lng()}">
+            <time>${point.timestamp.toISOString()}</time>
+          </trkpt>
+        `;
+      });
 
-        function nuevaCarrera() {
-            clearInterval(timerInterval);
-            if (navigator.geolocation) {
-                navigator.geolocation.clearWatch(watchID);
-            }
-            distanciaRecorrida = 0;
-            pausedDuration = 0;
-            isPaused = false;
-            caloriasQuemadas = 0;
-            document.getElementById('distanciaObjetivo').value = "";
-            document.getElementById('tiempoObjetivoHoras').value = "";
-            document.getElementById('tiempoObjetivoMinutos').value = "";
-            document.getElementById('ritmoObjetivo').innerHTML = "";
-            document.getElementById('feedback').innerHTML = "";
-            path.setPath([]);
-            marker.setPosition(null);
-            kmMarkers.forEach(marker => marker.setMap(null)); // Eliminar los marcadores de kilómetros
-            kmMarkers = [];
-        }
+      gpxData += `
+            </trkseg>
+          </trk>
+        </gpx>
+      `;
 
-        function exportarGPX() {
-            // Aquí iría el código para exportar la ruta GPX
-        }
-    </script>
+      // Aquí podrías agregar la lógica para descargar el archivo GPX
+      console.log("GPX Data:", gpxData);
+    }
+
+    function nuevaCarrera() {
+      clearInterval(timerInterval);
+      if (navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchID);
+      }
+      startTime = null;
+      endTime = null;
+      isPaused = false;
+      pausedTime = null;
+      pausedDuration = 0;
+      distanciaRecorrida = 0;
+      caloriasQuemadas = 0;
+      kmMarkers.forEach(marker => marker.setMap(null));
+      kmMarkers = [];
+      path.setPath([]);
+      document.getElementById('feedback').innerHTML = "";
+    }
+
+    function mostrarRitmosPorKm() {
+      let ritmosPorKm = "";
+      for (let i = 0; i < kmMarkers.length; i++) {
+        ritmosPorKm += `Km ${i + 1}: ${calcularRitmoPorKm(i)}<br>`;
+      }
+      document.getElementById('feedback').innerHTML = `
+        <h3>Ritmos por Kilómetro</h3>
+        <div>${ritmosPorKm}</div>
+      `;
+    }
+
+    function calcularRitmoPorKm(index) {
+      if (index === 0) {
+        return "N/A"; // No hay ritmo para el primer kilómetro completo
+      }
+      const prevMarker = kmMarkers[index - 1].getPosition();
+      const currentMarker = kmMarkers[index].getPosition();
+      const distance = google.maps.geometry.spherical.computeDistanceBetween(prevMarker, currentMarker);
+      const tiempoTranscurrido = (currentMarker.timestamp - prevMarker.timestamp) / 1000; // Tiempo en segundos
+      const ritmo = tiempoTranscurrido / (distance / 1000) / 60; // Ritmo en minutos por kilómetro
+      return `${Math.floor(ritmo)}:${Math.floor(ritmo % 1 * 60)}`;
+    }
+  </script>
 </body>
 </html>
