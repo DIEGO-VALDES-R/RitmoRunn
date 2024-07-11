@@ -37,7 +37,8 @@
       margin: 10px 0 5px;
     }
 
-    input[type="number"] {
+    input[type="number"],
+    input[type="text"] {
       width: calc(100% - 22px);
       padding: 10px;
       margin-bottom: 20px;
@@ -63,10 +64,13 @@
     .export-btn { background-color: blue; }
     .calculate-btn { background-color: purple; }
     .reset-btn { background-color: gray; }
+    .analyze-btn { background-color: teal; }
+    .save-btn { background-color: black; }
 
     .button-row {
       display: flex;
       justify-content: space-between;
+      margin-bottom: 10px;
     }
 
     .button-row button {
@@ -91,44 +95,57 @@
 
     .achieved { color: green; }
     .not-achieved { color: red; }
-
-    /* Estilo para el tamaño del texto de "By Diego Valdés" */
-    .container h2 {
-      font-size: 0.8em; /* Tamaño más pequeño */
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="C:/Users/diego.valdes/OneDrive - office365tl/VISUAL STUDIO CODE/imagenes/PORTADA.jpg" alt="Portada de la app">
+    <div>
     <h1 style="font-size: 1.5em;">Alcanza Tu Ritmo Ideal</h1>
-    <h2 style="font-size: 1em;">By Diego Valdés</h2> <!-- Ajuste de tamaño de texto -->
-    <!-- Agregar el nuevo botón -->
-    <button onclick="mostrarRitmosPorKm()">Analizar tus ritmos por kilómetro</button>
+    <h2 style="font-size: 1em;">By Diego Valdés</h2>
+
+    <div>
+      <label for="nombreCarrera">Nombre de la Carrera:</label>
+      <input type="text" id="nombreCarrera" placeholder="Ingresa el nombre de tu carrera">
+    </div>
+    
     <div>
       <label for="distanciaObjetivo">Distancia Objetivo (Km):</label>
       <input type="number" id="distanciaObjetivo" min="0" step="0.01">
     </div>
-    <div class="time-inputs">
-      <div>
-        <label for="tiempoObjetivoHoras">Tiempo Objetivo (Hrs):</label>
-        <input type="number" id="tiempoObjetivoHoras" min="0" step="1">
-      </div>
-      <div>
-        <label for="tiempoObjetivoMinutos">Tiempo Objetivo (Min):</label>
-        <input type="number" id="tiempoObjetivoMinutos" min="0" step="1">
+    
+    <div>
+      <label>Tiempo Objetivo:</label>
+      <div class="time-inputs">
+        <div>
+          <label for="tiempoObjetivoHoras">Hrs:</label>
+          <input type="number" id="tiempoObjetivoHoras" min="0" step="1">
+        </div>
+        <div>
+          <label for="tiempoObjetivoMinutos">Min:</label>
+          <input type="number" id="tiempoObjetivoMinutos" min="0" step="1">
+        </div>
       </div>
     </div>
+    
     <button class="calculate-btn" onclick="calcularRitmo()">Calcular Ritmo</button>
     <div id="ritmoObjetivo"></div>
-    
+
     <div class="button-row">
       <button class="start-btn" onclick="iniciarCarrera()">Iniciar Carrera</button>
       <button class="pause-btn" onclick="pausarCarrera()">Pausar Carrera</button>
     </div>
-    <button class="stop-btn" onclick="finalizarCarrera()">Finalizar Carrera</button>
-    <button class="export-btn" onclick="exportarGPX()">Exportar tu Ruta GPX</button>
-    <button class="reset-btn" onclick="nuevaCarrera()">Nueva Carrera</button>
+    
+    <div class="button-row">
+      <button class="stop-btn" onclick="finalizarCarrera()">Finalizar Carrera</button>
+      <button class="reset-btn" onclick="nuevaCarrera()">Nueva Carrera</button>
+    </div>
+
+    <div class="button-row">
+      <button class="analyze-btn" onclick="mostrarRitmosPorKm()">Analizar tus Ritmos</button>
+      <button class="export-btn" onclick="exportarGPX()">Exportar tu Ruta GPX</button>
+    </div>
+    
+    <button class="save-btn" onclick="guardarCarrera()">Guardar tu Carrera</button>
 
     <div id="feedback"></div>
     <div id="map"></div>
@@ -252,116 +269,123 @@
       caloriasQuemadas = distanciaRecorrida * CALORIAS_POR_KM;
 
       document.getElementById('feedback').innerHTML = `
-        <p>Ritmo actual: ${(ritmoPromedio).toFixed(2)} min/km</p>
-        <p>Distancia Recorrida: ${(distanciaRecorrida).toFixed(2)} km</p>
-        <p>Calorías quemadas: ${caloriasQuemadas.toFixed(2)}</p>
+        <p>Distancia Recorrida: ${distanciaRecorrida.toFixed(2)} km</p>
+        <p>Tiempo Transcurrido: ${formatTime(elapsedTime)}</p>
+        <p>Ritmo Promedio: ${ritmoPromedio.toFixed(2)} min/km</p>
+        <p>Calorías Quemadas: ${caloriasQuemadas.toFixed(0)}</p>
       `;
     }
 
-    function mostrarResultados() {
-      let tiempoTranscurrido = (endTime - startTime - pausedDuration) / 1000;
-      let ritmoObjetivo = calcularRitmoObjetivo(tiempoTranscurrido);
-      let distanciaObjetivo = document.getElementById('distanciaObjetivo').value || 0;
-
-      document.getElementById('feedback').innerHTML += `
-        <h3>Resultados</h3>
-        <p>Tiempo total: ${formatTime(tiempoTranscurrido)}</p>
-        <p>Ritmo promedio: ${ritmoObjetivo}</p>
-      `;
-
-      if (distanciaRecorrida >= distanciaObjetivo) {
-        document.getElementById('feedback').innerHTML += `<p class="achieved">Objetivo alcanzado!</p>`;
-      } else {
-        document.getElementById('feedback').innerHTML += `<p class="not-achieved">Objetivo no alcanzado.</p>`;
-      }
-    }
-
-    function calcularRitmoObjetivo(tiempoTranscurrido) {
-      let distanciaObjetivo = document.getElementById('distanciaObjetivo').value || 0;
-      let horasObjetivo = parseInt(document.getElementById('tiempoObjetivoHoras').value) || 0;
-      let minutosObjetivo = parseInt(document.getElementById('tiempoObjetivoMinutos').value) || 0;
-      let tiempoObjetivo = horasObjetivo * 3600 + minutosObjetivo * 60;
-      let ritmoObjetivo = tiempoObjetivo / (distanciaObjetivo);
-
-      return `${Math.floor(ritmoObjetivo / 60)}:${Math.floor(ritmoObjetivo % 60)}`;
-    }
-
-    function formatTime(segundos) {
-      let horas = Math.floor(segundos / 3600);
-      segundos %= 3600;
-      let minutos = Math.floor(segundos / 60);
-      segundos %= 60;
-
-      return `${horas}h ${minutos}m ${segundos}s`;
-    }
-
-    function exportarGPX() {
-      let gpxData = `
-        <?xml version="1.0" encoding="UTF-8"?>
-        <gpx version="1.1" creator="Tu Aplicación de Running" xmlns="http://www.topografix.com/GPX/1/1">
-          <trk>
-            <name>Recorrido de carrera</name>
-            <trkseg>
-      `;
-
-      const pathArray = path.getPath();
-      pathArray.forEach(point => {
-        gpxData += `
-          <trkpt lat="${point.lat()}" lon="${point.lng()}">
-            <time>${point.timestamp.toISOString()}</time>
-          </trkpt>
-        `;
-      });
-
-      gpxData += `
-            </trkseg>
-          </trk>
-        </gpx>
-      `;
-
-      // Aquí podrías agregar la lógica para descargar el archivo GPX
-      console.log("GPX Data:", gpxData);
+    function formatTime(seconds) {
+      let hrs = Math.floor(seconds / 3600);
+      let mins = Math.floor((seconds % 3600) / 60);
+      let secs = Math.floor(seconds % 60);
+      return `${hrs}h ${mins}m ${secs}s`;
     }
 
     function nuevaCarrera() {
-      clearInterval(timerInterval);
-      if (navigator.geolocation) {
-        navigator.geolocation.clearWatch(watchID);
-      }
-      startTime = null;
-      endTime = null;
-      isPaused = false;
-      pausedTime = null;
-      pausedDuration = 0;
-      distanciaRecorrida = 0;
-      caloriasQuemadas = 0;
-      kmMarkers.forEach(marker => marker.setMap(null));
-      kmMarkers = [];
-      path.setPath([]);
-      document.getElementById('feedback').innerHTML = "";
+      location.reload();
     }
 
-    function mostrarRitmosPorKm() {
-      let ritmosPorKm = "";
-      for (let i = 0; i < kmMarkers.length; i++) {
-        ritmosPorKm += `Km ${i + 1}: ${calcularRitmoPorKm(i)}<br>`;
+    function calcularRitmo() {
+      const distancia = parseFloat(document.getElementById('distanciaObjetivo').value);
+      const horas = parseFloat(document.getElementById('tiempoObjetivoHoras').value);
+      const minutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
+
+      if (isNaN(distancia) || isNaN(horas) || isNaN(minutos)) {
+        document.getElementById('ritmoObjetivo').innerText = "Por favor, introduce valores válidos.";
+        return;
       }
-      document.getElementById('feedback').innerHTML = `
-        <h3>Ritmos por Kilómetro</h3>
-        <div>${ritmosPorKm}</div>
+
+      const tiempoTotalMinutos = (horas * 60) + minutos;
+      const ritmoObjetivo = tiempoTotalMinutos / distancia;
+      document.getElementById('ritmoObjetivo').innerText = `Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km`;
+    }
+
+    function mostrarResultados() {
+      const distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
+      const horasObjetivo = parseFloat(document.getElementById('tiempoObjetivoHoras').value);
+      const minutosObjetivo = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
+      const tiempoObjetivoMinutos = (horasObjetivo * 60) + minutosObjetivo;
+      const tiempoCarrera = (endTime - startTime - pausedDuration) / 60000;
+      const ritmoPromedio = tiempoCarrera / distanciaRecorrida;
+
+      const objetivoLogrado = (distanciaRecorrida >= distanciaObjetivo) && (tiempoCarrera <= tiempoObjetivoMinutos);
+
+      document.getElementById('feedback').innerHTML += `
+        <p>Objetivo de Distancia: ${distanciaObjetivo} km</p>
+        <p>Objetivo de Tiempo: ${tiempoObjetivoMinutos} min</p>
+        <p>Tiempo de Carrera: ${tiempoCarrera.toFixed(2)} min</p>
+        <p>Ritmo Promedio: ${ritmoPromedio.toFixed(2)} min/km</p>
+        <p class="${objetivoLogrado ? 'achieved' : 'not-achieved'}">${objetivoLogrado ? '¡Objetivo Logrado!' : 'Objetivo No Logrado'}</p>
       `;
     }
 
-    function calcularRitmoPorKm(index) {
-      if (index === 0) {
-        return "N/A"; // No hay ritmo para el primer kilómetro completo
-      }
-      const prevMarker = kmMarkers[index - 1].getPosition();
-      const currentMarker = kmMarkers[index].getPosition();
-      const distance = google.maps.geometry.spherical.computeDistanceBetween(prevMarker, currentMarker);
-      const tiempoTranscurrido = (currentMarker.timestamp - prevMarker.timestamp) / 1000; // Tiempo en segundos
-      const ritmo = tiempoTranscurrido / (distance / 1000) / 60; // Ritmo en minutos por kilómetro
-      return `${Math.floor(ritmo)}:${Math.floor(ritmo % 1 * 60)}`;
+    function mostrarRitmosPorKm() {
+      const ritmos = [];
+      let totalTime = 0;
+      path.getPath().forEach((latLng, index) => {
+        if (index > 0) {
+          const prevLatLng = path.getPath().getAt(index - 1);
+          const segmentDistance = google.maps.geometry.spherical.computeDistanceBetween(prevLatLng, latLng) / 1000;
+          const segmentTime = (totalTime += segmentDistance) / distanciaRecorrida;
+          ritmos.push(segmentTime);
+        }
+      });
+
+      let ritmosHtml = "<h3>Ritmos por Kilómetro</h3><ul>";
+      ritmos.forEach((ritmo, index) => {
+        ritmosHtml += `<li>Kilómetro ${index + 1}: ${ritmo.toFixed(2)} min/km</li>`;
+      });
+      ritmosHtml += "</ul>";
+      document.getElementById('feedback').innerHTML += ritmosHtml;
+    }
+
+    function exportarGPX() {
+      const gpxData = `<?xml version="1.0" encoding="UTF-8"?>
+        <gpx version="1.1" creator="Alcanza Tu Ritmo Ideal">
+          <trk>
+            <name>Carrera</name>
+            <trkseg>
+              ${path.getPath().getArray().map(latLng => `
+                <trkpt lat="${latLng.lat()}" lon="${latLng.lng()}">
+                  <ele>0</ele>
+                </trkpt>`).join('')}
+            </trkseg>
+          </trk>
+        </gpx>`;
+      const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'carrera.gpx';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function guardarCarrera() {
+      const nombreCarrera = document.getElementById('nombreCarrera').value;
+      const kmRecorridos = distanciaRecorrida.toFixed(2);
+      const tiempoTranscurrido = formatTime((new Date() - startTime - pausedDuration) / 1000);
+      const ritmoPromedio = ((new Date() - startTime - pausedDuration) / 60000) / distanciaRecorrida;
+      const fechaCarrera = new Date().toLocaleDateString();
+      const horaInicio = startTime.toLocaleTimeString();
+      const calorias = caloriasQuemadas.toFixed(0);
+
+      const carreraData = {
+        nombreCarrera,
+        kmRecorridos,
+        tiempoTranscurrido,
+        ritmoPromedio: ritmoPromedio.toFixed(2),
+        rutaGPX: path.getPath().getArray(),
+        calorias,
+        fechaCarrera,
+        horaInicio
+      };
+
+      localStorage.setItem('ultimaCarrera', JSON.stringify(carreraData));
+
+      alert('¡Carrera guardada con éxito!');
     }
   </script>
 </body>
