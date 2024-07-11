@@ -62,6 +62,7 @@
         .stop-btn { background-color: red; }
         .export-btn { background-color: blue; }
         .calculate-btn { background-color: purple; }
+        .reset-btn { background-color: gray; }
 
         .button-row {
             display: flex;
@@ -84,16 +85,14 @@
 </head>
 <body>
     <div class="container">
-        <h1 style="font-size: 1.5em;">Alcanza Tu Ritmo Ideal</h1>
         <img src="C:/Users/diego.valdes/OneDrive - office365tl/VISUAL STUDIO CODE/imagenes/PORTADA.jpg" alt="Portada de la app">
+        <h1 style="font-size: 1.5em;">Alcanza Tu Ritmo Ideal</h1>
         <div>
             <label for="distanciaObjetivo">Distancia Objetivo (Km):</label>
             <input type="number" id="distanciaObjetivo" min="0" step="0.01">
-        </div>
         <div>
             <label for="tiempoObjetivoHoras">Tiempo Objetivo (Hrs):</label>
             <input type="number" id="tiempoObjetivoHoras" min="0" step="1">
-        </div>
         <div>
             <label for="tiempoObjetivoMinutos">Tiempo Objetivo (Min):</label>
             <input type="number" id="tiempoObjetivoMinutos" min="0" step="1">
@@ -107,7 +106,7 @@
         </div>
         <button class="stop-btn" onclick="finalizarCarrera()">Finalizar Carrera</button>
         <button class="export-btn" onclick="exportarGPX()">Exportar tu Ruta GPX</button>
-        
+        <button class="reset-btn" onclick="nuevaCarrera()">Nueva Carrera</button>
 
         <div id="feedback"></div>
         <div id="map"></div>
@@ -120,8 +119,7 @@
         let distanciaRecorrida = 0;
         let watchID;
         let isPaused = false;
-        let elapsedTimePaused = 0;
-        let pausedDuration = 0;
+        let pausedTime, pausedDuration = 0;
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -149,7 +147,6 @@
                     distanciaRecorrida = 0;
                     document.getElementById('feedback').innerHTML = "";
                 } else {
-                    // Ajustar el tiempo de inicio para no contar el tiempo pausado
                     pausedDuration += (new Date() - pausedTime);
                 }
                 isPaused = false;
@@ -249,6 +246,23 @@
                 <p class="${logroTiempo === 'Cumplido' ? 'achieved' : 'not-achieved'}">Tiempo Objetivo: ${logroTiempo}</p>
             `;
             document.getElementById('feedback').innerHTML = feedback;
+        }
+
+        function nuevaCarrera() {
+            clearInterval(timerInterval);
+            if (navigator.geolocation) {
+                navigator.geolocation.clearWatch(watchID);
+            }
+            distanciaRecorrida = 0;
+            pausedDuration = 0;
+            isPaused = false;
+            document.getElementById('distanciaObjetivo').value = "";
+            document.getElementById('tiempoObjetivoHoras').value = "";
+            document.getElementById('tiempoObjetivoMinutos').value = "";
+            document.getElementById('ritmoObjetivo').innerHTML = "";
+            document.getElementById('feedback').innerHTML = "";
+            path.setPath([]);
+            marker.setPosition(null);
         }
 
         function exportarGPX() {
