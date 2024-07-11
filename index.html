@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alcanza Tu Ritmo Ideal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            padding: 10px; /* Agregado para mejor visualización en dispositivos móviles */
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px; /* Máximo ancho para mejor visualización en móviles */
+        }
+
+        .container img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .start-btn { background-color: green; }
+        .pause-btn { background-color: orange; }
+        .stop-btn { background-color: red; }
+        .export-btn { background-color: blue; }
+        .calculate-btn { background-color: purple; }
+
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .button-row button {
+            width: 48%; /* Ajustar el ancho de los botones en la fila */
+        }
+
+        #map {
+            height: 300px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .achieved { color: green; }
+        .not-achieved { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="font-size: 1.5em;">Alcanza Tu Ritmo Ideal</h1>
+        <img src="C:/Users/diego.valdes/OneDrive - office365tl/VISUAL STUDIO CODE/imagenes/PORTADA.jpg" alt="Portada de la app">
+        <div>
+            <label for="distanciaObjetivo">Distancia Objetivo (Km):</label>
+            <input type="number" id="distanciaObjetivo" min="0" step="0.01">
+        </div>
+        <div>
+            <label for="tiempoObjetivoHoras">Tiempo Objetivo (Hrs):</label>
+            <input type="number" id="tiempoObjetivoHoras" min="0" step="1">
+        </div>
+        <div>
+            <label for="tiempoObjetivoMinutos">Tiempo Objetivo (Min):</label>
+            <input type="number" id="tiempoObjetivoMinutos" min="0" step="1">
+        </div>
+        <button class="calculate-btn" onclick="calcularRitmo()">Calcular Ritmo</button>
+        <div id="ritmoObjetivo"></div>
+        
+        <div class="button-row">
+            <button class="start-btn" onclick="iniciarCarrera()">Iniciar Carrera</button>
+            <button class="pause-btn" onclick="pausarCarrera()">Pausar Carrera</button>
+        </div>
+        <button class="stop-btn" onclick="finalizarCarrera()">Finalizar Carrera</button>
+        <button class="export-btn" onclick="exportarGPX()">Exportar tu Ruta GPX</button>
+        
+
+        <div id="feedback"></div>
+        <div id="map"></div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&callback=initMap" async defer></script>
+    <script>
+        let map, marker, path;
+        let startTime, endTime, timerInterval;
+        let distanciaRecorrida = 0;
+        let watchID;
+        let isPaused = false;
+        let elapsedTimePaused = 0;
+        let pausedDuration = 0;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 15,
+            });
+            marker = new google.maps.Marker({
+                map: map,
+                title: 'Tu ubicación actual',
+            });
+            path = new google.maps.Polyline({
+                map: map,
+                path: [],
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+        }
+
+        function iniciarCarrera() {
+            if (navigator.geolocation) {
+                if (!isPaused) {
+                    startTime = new Date();
+                    distanciaRecorrida = 0;
+                    document.getElementById('feedback').innerHTML = "";
+                } else {
+                    // Ajustar el tiempo de inicio para no contar el tiempo pausado
+                    pausedDuration += (new Date() - pausedTime);
+                }
+                isPaused = false;
+                watchID = navigator.geolocation.watchPosition(updateLocation, handleError, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                });
+                timerInterval = setInterval(updateFeedback, 1000);
+            } else {
+                alert("La geolocalización no es soportada por este navegador.");
+            }
+        }
+
+        function pausarCarrera() {
+            if (!isPaused) {
+                clearInterval(timerInterval);
+                if (navigator.geolocation) {
+                    navigator.geolocation.clearWatch(watchID);
+                }
+                pausedTime = new Date();
+                isPaused = true;
+            }
+        }
+
+        function finalizarCarrera() {
+            endTime = new Date();
+            clearInterval(timerInterval);
+            if (navigator.geolocation) {
+                navigator.geolocation.clearWatch(watchID);
+            }
+            mostrarResultados();
+        }
+
+        function updateLocation(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const currentPosition = new google.maps.LatLng(lat, lng);
+            marker.setPosition(currentPosition);
+            map.setCenter(currentPosition);
+
+            const pathArray = path.getPath();
+            pathArray.push(currentPosition);
+            path.setPath(pathArray);
+
+            if (pathArray.getLength() > 1) {
+                const prevPos = pathArray.getAt(pathArray.getLength() - 2);
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(prevPos, currentPosition);
+                distanciaRecorrida += distance / 1000; // Convertir a kilómetros
+            }
+        }
+
+        function handleError(error) {
+            console.error("Error en la geolocalización: ", error);
+        }
+
+        function updateFeedback() {
+            let currentTime = new Date();
+            let elapsedTime = ((currentTime - startTime - pausedDuration) / 1000); // En segundos
+            let ritmoPromedio = (elapsedTime / 60) / distanciaRecorrida;
+
+            document.getElementById('feedback').innerHTML = `
+                <p>Ritmo actual: ${(ritmoPromedio).toFixed(2)} min/km</p>
+                <p>Distancia Recorrida: ${(distanciaRecorrida).toFixed(2)} km</p>
+                <p>Tiempo Transcurrido: ${Math.floor(elapsedTime / 3600)} hrs, ${Math.floor((elapsedTime % 3600) / 60)} mins, ${Math.floor(elapsedTime % 60)} segs</p>
+            `;
+        }
+
+        function calcularRitmo() {
+            let distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
+            let tiempoObjetivoHoras = parseInt(document.getElementById('tiempoObjetivoHoras').value) || 0;
+            let tiempoObjetivoMinutos = parseInt(document.getElementById('tiempoObjetivoMinutos').value) || 0;
+            let tiempoObjetivo = (tiempoObjetivoHoras * 60) + tiempoObjetivoMinutos;
+            let ritmoObjetivo = tiempoObjetivo / distanciaObjetivo;
+            
+            document.getElementById('ritmoObjetivo').innerHTML = `
+                <p>Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km</p>
+            `;
+        }
+
+        function mostrarResultados() {
+            let distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
+            let tiempoObjetivoHoras = parseInt(document.getElementById('tiempoObjetivoHoras').value) || 0;
+            let tiempoObjetivoMinutos = parseInt(document.getElementById('tiempoObjetivoMinutos').value) || 0;
+            let tiempoObjetivo = (tiempoObjetivoHoras * 60) + tiempoObjetivoMinutos;
+            let tiempoTranscurrido = ((endTime - startTime - pausedDuration) / 1000) / 60; // En minutos
+
+            let ritmoPromedio = (tiempoTranscurrido) / distanciaRecorrida;
+            let logroDistancia = distanciaRecorrida >= distanciaObjetivo ? "Cumplido" : "No Cumplido";
+            let logroTiempo = tiempoTranscurrido <= tiempoObjetivo ? "Cumplido" : "No Cumplido";
+
+            let feedback = `
+                <p>Ritmo promedio: ${(ritmoPromedio).toFixed(2)} min/km</p>
+                <p>Distancia Recorrida: ${(distanciaRecorrida).toFixed(2)} km</p>
+                <p>Tiempo Transcurrido: ${Math.floor(tiempoTranscurrido / 60)} hrs, ${Math.floor(tiempoTranscurrido % 60)} mins</p>
+                <p class="${logroDistancia === 'Cumplido' ? 'achieved' : 'not-achieved'}">Distancia Objetivo: ${logroDistancia}</p>
+                <p class="${logroTiempo === 'Cumplido' ? 'achieved' : 'not-achieved'}">Tiempo Objetivo: ${logroTiempo}</p>
+            `;
+            document.getElementById('feedback').innerHTML = feedback;
+        }
+
+        function exportarGPX() {
+            // Aquí iría el código para exportar la ruta GPX
+        }
+    </script>
+</body>
+</html>
