@@ -1,4 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alcanza Tu Ritmo Ideal</title>
+  <style>
+    body {
+      font-family: Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      padding: 10px;
+    }
 
+    .container {
+      text-align: center;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 360px;
+    }
+
+    label {
+      display: block;
+      margin: 0px 0 5px;
+      font-size: 14px;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: calc(100% - 22px);
+      text-align: center;
+      padding: 8px;
+      margin-bottom: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 3px 0;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .start-btn { background-color: green; }
+    .pause-btn { background-color: orange; }
+    .stop-btn { background-color: red; }
+    .export-btn { background-color: blue; }
+    .calculate-btn { background-color: purple; }
+    .reset-btn { background-color: gray; }
+    .analyze-btn { background-color: teal; }
+    .save-btn { background-color: black; }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom:0px;
+    }
+
+    .button-row button {
+      width: 48%;
+    }
+
+    .time-inputs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0px;
+    }
+
+    .time-inputs div {
+      width: 48%;
+    }
+
+    #map {
       height: 150px;
       width: 100%;
       margin-top: 10px;
