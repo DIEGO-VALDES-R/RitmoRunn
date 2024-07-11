@@ -13,7 +13,7 @@
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
-            padding: 10px; /* Agregado para mejor visualización en dispositivos móviles */
+            padding: 10px;
         }
 
         .container {
@@ -23,7 +23,7 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px; /* Máximo ancho para mejor visualización en móviles */
+            max-width: 400px;
         }
 
         .container img {
@@ -70,11 +70,21 @@
         }
 
         .button-row button {
-            width: 28%; /* Ajustar el ancho de los botones en la fila */
+            width: 48%;
+        }
+
+        .time-inputs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .time-inputs div {
+            width: 48%;
         }
 
         #map {
-            height: 200px;
+            height: 300px;
             width: 100%;
             margin-top: 20px;
         }
@@ -91,13 +101,15 @@
             <label for="distanciaObjetivo">Distancia Objetivo (Km):</label>
             <input type="number" id="distanciaObjetivo" min="0" step="0.01">
         </div>
-        <div>
-            <label for="tiempoObjetivoHoras">Tiempo Objetivo (Hrs):</label>
-            <input type="number" id="tiempoObjetivoHoras" min="0" step="1">
-        </div>
-        <div>
-            <label for="tiempoObjetivoMinutos">Tiempo Objetivo (Min):</label>
-            <input type="number" id="tiempoObjetivoMinutos" min="0" step="1">
+        <div class="time-inputs">
+            <div>
+                <label for="tiempoObjetivoHoras">Tiempo Objetivo (Hrs):</label>
+                <input type="number" id="tiempoObjetivoHoras" min="0" step="1">
+            </div>
+            <div>
+                <label for="tiempoObjetivoMinutos">Tiempo Objetivo (Min):</label>
+                <input type="number" id="tiempoObjetivoMinutos" min="0" step="1">
+            </div>
         </div>
         <button class="calculate-btn" onclick="calcularRitmo()">Calcular Ritmo</button>
         <div id="ritmoObjetivo"></div>
@@ -122,6 +134,9 @@
         let watchID;
         let isPaused = false;
         let pausedTime, pausedDuration = 0;
+        let kmMarkers = [];
+        let caloriasQuemadas = 0;
+        const CALORIAS_POR_KM = 60;
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -147,6 +162,7 @@
                 if (!isPaused) {
                     startTime = new Date();
                     distanciaRecorrida = 0;
+                    caloriasQuemadas = 0;
                     document.getElementById('feedback').innerHTML = "";
                 } else {
                     pausedDuration += (new Date() - pausedTime);
@@ -197,7 +213,23 @@
             if (pathArray.getLength() > 1) {
                 const prevPos = pathArray.getAt(pathArray.getLength() - 2);
                 const distance = google.maps.geometry.spherical.computeDistanceBetween(prevPos, currentPosition);
-                distanciaRecorrida += distance / 1000; // Convertir a kilómetros
+                distanciaRecorrida += distance / 1000;
+
+                if (Math.floor(distanciaRecorrida) > kmMarkers.length) {
+                    const kmMarker = new google.maps.Marker({
+                        position: currentPosition,
+                        map: map,
+                        label: `${kmMarkers.length + 1} km`,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 5,
+                            fillColor: '#00F',
+                            fillOpacity: 1,
+                            strokeWeight: 1,
+                        },
+                    });
+                    kmMarkers.push(kmMarker);
+                }
             }
         }
 
@@ -207,12 +239,14 @@
 
         function updateFeedback() {
             let currentTime = new Date();
-            let elapsedTime = ((currentTime - startTime - pausedDuration) / 1000); // En segundos
+            let elapsedTime = ((currentTime - startTime - pausedDuration) / 1000);
             let ritmoPromedio = (elapsedTime / 60) / distanciaRecorrida;
+            caloriasQuemadas = distanciaRecorrida * CALORIAS_POR_KM;
 
             document.getElementById('feedback').innerHTML = `
                 <p>Ritmo actual: ${(ritmoPromedio).toFixed(2)} min/km</p>
                 <p>Distancia Recorrida: ${(distanciaRecorrida).toFixed(2)} km</p>
+                <p>Calorías Quemadas: ${caloriasQuemadas.toFixed(2)} kcal</p>
                 <p>Tiempo Transcurrido: ${Math.floor(elapsedTime / 3600)} hrs, ${Math.floor((elapsedTime % 3600) / 60)} mins, ${Math.floor(elapsedTime % 60)} segs</p>
             `;
         }
@@ -243,6 +277,7 @@
             let feedback = `
                 <p>Ritmo promedio: ${(ritmoPromedio).toFixed(2)} min/km</p>
                 <p>Distancia Recorrida: ${(distanciaRecorrida).toFixed(2)} km</p>
+                <p>Calorías Quemadas: ${caloriasQuemadas.toFixed(2)} kcal</p>
                 <p>Tiempo Transcurrido: ${Math.floor(tiempoTranscurrido / 60)} hrs, ${Math.floor(tiempoTranscurrido % 60)} mins</p>
                 <p class="${logroDistancia === 'Cumplido' ? 'achieved' : 'not-achieved'}">Distancia Objetivo: ${logroDistancia}</p>
                 <p class="${logroTiempo === 'Cumplido' ? 'achieved' : 'not-achieved'}">Tiempo Objetivo: ${logroTiempo}</p>
@@ -258,6 +293,7 @@
             distanciaRecorrida = 0;
             pausedDuration = 0;
             isPaused = false;
+            caloriasQuemadas = 0;
             document.getElementById('distanciaObjetivo').value = "";
             document.getElementById('tiempoObjetivoHoras').value = "";
             document.getElementById('tiempoObjetivoMinutos').value = "";
@@ -265,6 +301,8 @@
             document.getElementById('feedback').innerHTML = "";
             path.setPath([]);
             marker.setPosition(null);
+            kmMarkers.forEach(marker => marker.setMap(null)); // Eliminar los marcadores de kilómetros
+            kmMarkers = [];
         }
 
         function exportarGPX() {
