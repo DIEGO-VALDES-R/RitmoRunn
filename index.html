@@ -192,7 +192,6 @@
           maximumAge: 0,
         });
         timerInterval = setInterval(updateFeedback, 1000);
-        // Inicia el chequeo de ritmo cada 30 segundos
         intervalID = setInterval(checkRitmo, 30000);
       } else {
         alert("La geolocalización no es soportada por este navegador.");
@@ -264,6 +263,10 @@
 
       if (!ritmoAlcanzado) {
         document.getElementById('ritmoObjetivo').classList.add('not-achieved');
+        notificarRitmo('Debes aumentar el ritmo');
+      } else {
+        document.getElementById('ritmoObjetivo').classList.remove('not-achieved');
+        notificarRitmo('Vas en buen ritmo');
       }
     }
 
@@ -382,7 +385,7 @@
           <name>${document.getElementById('nombreCarrera').value}</name>
           <desc>Carrera realizada con la app de Diego Valdés App</desc>
           <trkseg>
-            ${path.getPath().getArray().map(pos => `<trkpt lat="${pos.lat()}" lon="${pos.lng()}"><time>${pos.timestamp.toISOString()}</time></trkpt>`).join('\n')}
+            ${path.getPath().getArray().map(pos => `<trkpt lat="${pos.lat()}" lon="${pos.lng()}"><time>${new Date().toISOString()}</time></trkpt>`).join('\n')}
           </trkseg>
         </trk>
       </gpx>`;
@@ -417,6 +420,14 @@
       // Guardar en localStorage
       localStorage.setItem('ultimaCarrera', JSON.stringify(carrera));
       alert(`Carrera guardada:\nNombre: ${carrera.nombre}\nFecha: ${carrera.fecha}\nTiempo inicio: ${carrera.tiempoInicio}\nDistancia: ${carrera.distancia} Km\nRitmo promedio: ${carrera.ritmoPromedio} min/Km`);
+    }
+
+    function notificarRitmo(mensaje) {
+      if (!utterance) {
+        utterance = new SpeechSynthesisUtterance();
+      }
+      utterance.text = mensaje;
+      speechSynthesis.speak(utterance);
     }
   </script>
 </body>
