@@ -342,10 +342,10 @@
       const ritmoObjetivo = calcularRitmoObjetivo();
       const ritmoPromedio = calcularRitmoPromedio();
       if (ritmoPromedio <= ritmoObjetivo) {
-        utterance = new SpeechSynthesisUtterance(`¡Vas bien! Ritmo Actual: ${ritmoPromedio.toFixed(2)} min/km.`);
+        utterance = new SpeechSynthesisUtterance(`¡Vas bien! Ritmo Actual: ${ritmoPromedio.toFixed(2)} `);
         speechSynthesis.speak(utterance);
       } else {
-        utterance = new SpeechSynthesisUtterance(`¡Apresúrate! Ritmo Actual: ${ritmoPromedio.toFixed(2)} min/km.`);
+        utterance = new SpeechSynthesisUtterance(`¡Apresúrate! Ritmo Actual: ${ritmoPromedio.toFixed(2)} `);
         speechSynthesis.speak(utterance);
         ritmoAlcanzado = false;
       }
