@@ -9,17 +9,17 @@
       font-family: 'Roboto', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f5f5f5;
+      background-color: hsl(66, 88%, 49%);
       color: #333;
     }
     .container {
-      max-width: 600px;
+      max-width: 400px;
       margin: 0 auto;
       padding: 20px;
     }
     h1, h2, h3 {
       text-align: center;
-      color: #2196F3;
+      color: #05233b;
     }
     .card {
       background-color: #fff;
@@ -30,8 +30,8 @@
     }
     input, button {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
+      padding: 5px;
+      margin: 5px 0;
       border: 1px solid #ddd;
       border-radius: 4px;
       box-sizing: border-box;
@@ -41,24 +41,24 @@
       justify-content: space-between;
     }
     .button-group button {
-      width: 48%;
+      width: 38%;
     }
     .time-input {
       display: flex;
       justify-content: space-between;
     }
     .time-input input {
-      width: 48%;
+      width: 28%;
     }
     button {
-      background-color: #2196F3;
+      background-color: #112075;
       color: white;
       border: none;
       cursor: pointer;
       transition: background-color 0.3s;
     }
     button:hover {
-      background-color: #1de40a;
+      background-color: #f7a01f;
     }
     button.active {
       background-color: #1de40a;
@@ -99,7 +99,7 @@
       <input type="text" id="nombreCarrera" placeholder="Nombre de la carrera">
       <h3>Distancia objetivo km</h3>
       <input type="number" id="distanciaObjetivo" placeholder="Distancia objetivo (km)" value="0">
-      <h3>Distancia objetivo km</h3>
+      <h3>Tiempo Objetivo Hrs - Min</h3>
       <div class="time-input">
         <input type="number" id="tiempoObjetivoHoras" placeholder="Tiempo objetivo (horas)" value="0">
         <input type="number" id="tiempoObjetivoMinutos" placeholder="Tiempo objetivo (minutos)" value="0">
@@ -153,6 +153,49 @@
     let ritmoAlcanzado = true;
     let intervalID;
     let foto;
+
+    function startCountdown() {
+        const counterElement = document.getElementById('counter');
+        let counter = 5;
+        counterElement.style.display = 'flex';
+        counterElement.textContent = counter;
+        
+        const countdownInterval = setInterval(() => {
+          counter--;
+          if (counter === 0) {
+            clearInterval(countdownInterval);
+            counterElement.style.display = 'none';
+            startRunning();
+            speak("Inicia la carrera");
+          } else {
+            counterElement.textContent = counter;
+          }
+        }, 1000);
+      }
+
+      function speak(text) {
+        const msg = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(msg);
+      }
+
+      function startRunning() {
+        if (!isRunning) {
+          isRunning = true;
+          startTime = new Date();
+          if (isPaused) {
+            pausedDuration += new Date() - pausedTime;
+          }
+          isPaused = false;
+          document.getElementById('pausarBtn').classList.remove('active');
+          document.getElementById('iniciarBtn').classList.add('active');
+          watchID = navigator.geolocation.watchPosition(updateLocation, handleError, {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 5000,
+          });
+          intervalID = setInterval(updateFeedback, 1000);
+        }
+      }
 
     function initMap() {
       map = new google.maps.Map(document.getElementById('map'), {
