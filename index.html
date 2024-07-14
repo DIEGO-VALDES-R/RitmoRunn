@@ -440,10 +440,28 @@
     }
 
     function tomarFoto() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 300;
-      canvas.height = 150;
-      const ctx = canvas.getContext('2d');
+  const video = document.createElement('video');
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then((stream) => {
+      video.srcObject = stream;
+      video.onloadedmetadata = () => {
+        video.play();
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        video.srcObject.getVideoTracks()[0].stop();
+        foto = canvas.toDataURL('image/jpeg');
+        document.getElementById('canvas').src = foto;
+        document.getElementById('canvas').style.display = 'block';
+      };
+    })
+    .catch((error) => {
+      console.error('Error al acceder a la cámara: ', error);
+    });
+}
       ctx.font = '24px Arial';
       ctx.fillStyle = '#2196F3';
       ctx.fillText('¡Carrera completada!', 10, 30);
@@ -461,8 +479,7 @@
         a.download = 'carrera_completada.png';
         a.click();
       };
-    }
-
+  
     function cargarEjemplo() {
       document.getElementById('nombreCarrera').value = 'Entrenamiento Mañanero';
       document.getElementById('distanciaObjetivo').value = 5;
