@@ -279,42 +279,46 @@
     }
 
     function nuevaCarrera() {
-      if (confirm("¿Deseas guardar la carrera antes de borrarla?")) {
-        guardarCarrera();
-      }
-      document.getElementById('feedback').innerHTML = "";
-      document.getElementById('ritmoObjetivo').innerHTML = "";
-      document.getElementById('distanciaObjetivo').value = "";
-      document.getElementById('tiempoObjetivoHoras').value = "";
-      document.getElementById('tiempoObjetivoMinutos').value = "";
-      document.getElementById('nombreCarrera').value = "";
-      map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 15,
-      });
-      path = new google.maps.Polyline({
-        map: map,
-        path: [],
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2,
-      });
-      clearInterval(timerInterval);
-      clearInterval(intervalID);
-      if (navigator.geolocation) {
-        navigator.geolocation.clearWatch(watchID);
-      }
-      distanciaRecorrida = 0;
-      caloriasQuemadas = 0;
-      isPaused = false;
-      pausedDuration = 0;
-      kmMarkers = [];
-      document.getElementById('iniciarBtn').classList.remove('active');
-      document.getElementById('pausarBtn').classList.remove('active');
-      document.getElementById('pausarBtn').textContent = 'Pausar Carrera';
-    }
+  if (confirm("¿Deseas guardar la carrera antes de borrarla?")) {
+    guardarCarrera();
+  }
+  document.getElementById('feedback').innerHTML = "";
+  document.getElementById('ritmoObjetivo').innerHTML = "";
+  document.getElementById('distanciaObjetivo').value = "";
+  document.getElementById('tiempoObjetivoHoras').value = "";
+  document.getElementById('tiempoObjetivoMinutos').value = "";
+  document.getElementById('nombreCarrera').value = "";
+  
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: { lat: -34.397, lng: 150.644 },
+    zoom: 15,
+  });
+  
+  path = new google.maps.Polyline({
+    map: map,
+    path: [],
+    geodesic: true,
+    strokeColor: '#FF0000',
+    strokeOpacity: 1.0,
+    strokeWeight: 2,
+  });
 
+  clearInterval(timerInterval);
+  clearInterval(intervalID);
+  if (navigator.geolocation) {
+    navigator.geolocation.clearWatch(watchID);
+  }
+  
+  distanciaRecorrida = 0;
+  caloriasQuemadas = 0;
+  isPaused = false;
+  pausedDuration = 0;
+  kmMarkers = [];
+
+  document.getElementById('iniciarBtn').classList.remove('active');
+  document.getElementById('pausarBtn').classList.remove('active');
+  document.getElementById('pausarBtn').textContent = 'Pausar Carrera';
+}
     function updateLocation(position) {
       const { latitude, longitude } = position.coords;
       const currentLocation = new google.maps.LatLng(latitude, longitude);
