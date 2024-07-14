@@ -3,150 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alcanza Tu Ritmo Ideal</title>
+  <title>RunnersPace Pro</title>
   <style>
     body {
-      font-family: Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: 'Roboto', sans-serif;
       margin: 0;
-      background-color: #f0f0f0;
-      padding: 10px;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #333;
     }
-
     .container {
-      text-align: center;
-      background: white;
+      max-width: 600px;
+      margin: 0 auto;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 360px;
     }
-
-    label {
-      display: block;
-      margin: 0px 0 5px;
-      font-size: 14px;
-    }
-
-    input[type="number"],
-    input[type="text"] {
-      width: calc(100% - 22px);
+    h1, h2, h3 {
       text-align: center;
-      padding: 8px;
-      margin-bottom: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
+      color: #2196F3;
     }
-
-    button {
-      display: block;
+    .card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    input, button {
       width: 100%;
       padding: 10px;
-      margin: 3px 0;
-      border: none;
-      border-radius: 5px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #2196F3;
       color: white;
-      font-size: 14px;
+      border: none;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
-
-    .start-btn { background-color: green; }
-    .pause-btn { background-color: orange; }
-    .stop-btn { background-color: red; }
-    .export-btn { background-color: blue; }
-    .calculate-btn { background-color: purple; }
-    .reset-btn { background-color: gray; }
-    .analyze-btn { background-color: teal; }
-    .save-btn { background-color: black; }
-    .show-saved-btn { background-color: #8B4513; }
-
-    .button-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0px;
+    button:hover {
+      background-color: #1de40a;
     }
-
-    .button-row button {
-      width: 48%;
-    }
-
-    .time-inputs {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0px;
-    }
-
-    .time-inputs div {
-      width: 48%;
-    }
-
     #map {
-      height: 150px;
+      height: 300px;
       width: 100%;
-      margin-top: 10px;
+      border-radius: 8px;
+      margin-top: 20px;
     }
-
-    .achieved { color: green; }
-    .not-achieved { color: red; }
+    #feedback {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .achieved { color: #4CAF50; }
+    .not-achieved { color: #F44336; }
+    #carrerasGuardadas {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 style="font-size: 1.5em;">Alcanza Tu Ritmo Ideal</h1>
-    <h2 style="font-size: 1em;">By Diego Valdés App</h2>
-    <h3 style="font-size: 1em;">Versión de prueba 1.0</h3>
-
-    <div>
-      <label for="nombreCarrera">Nombre de la Carrera:</label>
-      <input type="text" id="nombreCarrera" placeholder="Ingresa el nombre de tu carrera">
+    <h1>Alcanza tu Ritmo</h1>
+    <h1>Versión de Prueba</h1>
+    <div class="card">
+      <input type="text" id="nombreCarrera" placeholder="Nombre de la carrera">
+      <input type="number" id="distanciaObjetivo" placeholder="Distancia objetivo (km)">
+      <input type="number" id="tiempoObjetivoHoras" placeholder="Tiempo objetivo (horas)">
+      <input type="number" id="tiempoObjetivoMinutos" placeholder="Tiempo objetivo (minutos)">
+      <button onclick="calcularRitmo()">Calcular Ritmo</button>
+      <div id="ritmoObjetivo"></div>
     </div>
     
-    <div>
-      <label for="distanciaObjetivo">Distancia Objetivo (Km):</label>
-      <input type="number" id="distanciaObjetivo" min="0" step="0.01" value="0">
+    <div class="card">
+      <button onclick="iniciarCarrera()">Iniciar Carrera</button>
+      <button onclick="pausarCarrera()">Pausar Carrera</button>
+      <button onclick="finalizarCarrera()">Finalizar Carrera</button>
+      <button onclick="nuevaCarrera()">Nueva Carrera</button>
     </div>
     
-    <div>
-      <label>Tiempo Objetivo:</label>
-      <div class="time-inputs">
-        <div>
-          <label for="tiempoObjetivoHoras">Hrs:</label>
-          <input type="number" id="tiempoObjetivoHoras" min="0" step="1" value="0">
-        </div>
-        <div>
-          <label for="tiempoObjetivoMinutos">Min:</label>
-          <input type="number" id="tiempoObjetivoMinutos" min="0" step="1" value="0">
-        </div>
-      </div>
+    <div class="card">
+      <button onclick="mostrarRitmosPorKm()">Analizar Ritmos</button>
+      <button onclick="exportarGPX()">Exportar Ruta GPX</button>
+      <button onclick="guardarCarrera()">Guardar Carrera</button>
+      <button onclick="toggleCarrerasGuardadas()">Mostrar/Ocultar Carreras Guardadas</button>
     </div>
     
-    <button class="calculate-btn" onclick="calcularRitmo()">Calcular Ritmo</button>
-    <div id="ritmoObjetivo"></div>
-
-    <div class="button-row">
-      <button class="start-btn" onclick="iniciarCarrera()">Iniciar Carrera</button>
-      <button class="pause-btn" onclick="pausarCarrera()">Pausar Carrera</button>
-    </div>
-    
-    <div class="button-row">
-      <button class="stop-btn" onclick="finalizarCarrera()">Finalizar Carrera</button>
-      <button class="reset-btn" onclick="nuevaCarrera()">Nueva Carrera</button>
-    </div>
-
-    <div class="button-row">
-      <button class="analyze-btn" onclick="mostrarRitmosPorKm()">Analizar tus Ritmos</button>
-      <button class="export-btn" onclick="exportarGPX()">Exportar tu Ruta GPX</button>
-    </div>
-    
-    <button class="save-btn" onclick="guardarCarrera()">Guardar tu Carrera</button>
-    <button class="show-saved-btn" onclick="mostrarCarrerasGuardadas()">Mostrar Carreras Guardadas</button>
-
-    <div id="feedback"></div>
+    <div id="feedback" class="card"></div>
+    <div id="carrerasGuardadas" class="card"></div>
     <div id="map"></div>
   </div>
 
@@ -293,30 +238,137 @@
         const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
         document.getElementById('ritmoObjetivo').innerHTML = `Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km`;
       } else {
-        document.getElementById('ritmoObjetivo').innerHTML = `Por favor ingresa valores válidos.`;
+        alert("Por favor ingrese valores válidos para distancia y tiempo objetivo.");
       }
     }
 
     function calcularRitmoPromedio() {
       const now = new Date();
-      const elapsedTime = (now - startTime - pausedDuration) / 60000; // convertir a minutos
-      const ritmoPromedio = distanciaRecorrida > 0 ? elapsedTime / distanciaRecorrida : 0;
-      return ritmoPromedio.toFixed(2);
+      const elapsedTime = new Date(now - startTime - pausedDuration);
+      const tiempoTotalMin = (elapsedTime.getUTCHours() * 60) + elapsedTime.getUTCMinutes() + (elapsedTime.getUTCSeconds() / 60);
+      return (tiempoTotalMin / distanciaRecorrida).toFixed(2);
     }
 
     function checkRitmo() {
-      const ritmoObjetivo = calcularRitmoObjetivo();
       const ritmoActual = calcularRitmoPromedio();
-      if (ritmoActual <= ritmoObjetivo) {
-        document.getElementById('feedback').classList.remove('not-achieved');
-        document.getElementById('feedback').classList.add('achieved');
-        utterance = new SpeechSynthesisUtterance("¡Vas bien, sigue así!");
+      const ritmoObjetivo = calcularRitmoObjetivo();
+      if (ritmoActual > ritmoObjetivo) {
+        speak(`¡Atención! Tu ritmo actual es de ${ritmoActual} minutos por kilómetro, por encima del objetivo de ${ritmoObjetivo} minutos por kilómetro.`);
+        ritmoAlcanzado = false;
       } else {
-        document.getElementById('feedback').classList.remove('achieved');
-        document.getElementById('feedback').classList.add('not-achieved');
-        utterance = new SpeechSynthesisUtterance("¡Apresúrate, estás por debajo del ritmo objetivo!");
+        speak(`¡Bien hecho! Tu ritmo actual es de ${ritmoActual} minutos por kilómetro, dentro del objetivo de ${ritmoObjetivo} minutos por kilómetro.`);
+        ritmoAlcanzado = true;
       }
+    }
+
+    function speak(text) {
+      if (speechSynthesis.speaking) {
+        console.error('speechSynthesis.speaking');
+        return;
+      }
+      utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-ES';
+      utterance.pitch = 1;
+      utterance.rate = 1;
       speechSynthesis.speak(utterance);
+    }
+
+    function mostrarResultados() {
+      const nombreCarrera = document.getElementById('nombreCarrera').value;
+      const tiempoTotal = new Date(endTime - startTime - pausedDuration);
+      const horas = String(tiempoTotal.getUTCHours()).padStart(2, '0');
+      const minutos = String(tiempoTotal.getUTCMinutes()).padStart(2, '0');
+      const segundos = String(tiempoTotal.getUTCSeconds()).padStart(2, '0');
+      const ritmoPromedio = calcularRitmoPromedio();
+      const fechaCarrera = startTime.toLocaleDateString();
+      const horaInicio = startTime.toLocaleTimeString();
+      
+      const resultados = `
+        <p><strong>Nombre de la Carrera:</strong> ${nombreCarrera}</p>
+        <p><strong>Fecha:</strong> ${fechaCarrera}</p>
+        <p><strong>Hora de Inicio:</strong> ${horaInicio}</p>
+        <p><strong>Tiempo Total:</strong> ${horas}:${minutos}:${segundos}</p>
+        <p><strong>Distancia Recorrida:</strong> ${distanciaRecorrida.toFixed(2)} Km</p>
+        <p><strong>Ritmo Promedio:</strong> ${ritmoPromedio} min/km</p>
+        <p><strong>Calorías Quemadas:</strong> ${caloriasQuemadas.toFixed(0)} cal</p>
+      `;
+      document.getElementById('feedback').innerHTML = resultados;
+    }
+
+    function nuevaCarrera() {
+      if (confirm("¿Estás seguro de que quieres empezar una nueva carrera? Todos los datos actuales se perderán.")) {
+        clearInterval(timerInterval);
+        clearInterval(intervalID);
+        if (navigator.geolocation) {
+          navigator.geolocation.clearWatch(watchID);
+        }
+        distanciaRecorrida = 0;
+        caloriasQuemadas = 0;
+        isPaused = false;
+        pausedDuration = 0;
+        kmMarkers.forEach(marker => marker.setMap(null));
+        kmMarkers = [];
+        path.setPath([]);
+        document.getElementById('feedback').innerHTML = "";
+        document.getElementById('nombreCarrera').value = "";
+        document.getElementById('distanciaObjetivo').value = "";
+        document.getElementById('tiempoObjetivoHoras').value = "";
+        document.getElementById('tiempoObjetivoMinutos').value = "";
+        document.getElementById('ritmoObjetivo').innerHTML = "";
+      }
+    }
+
+    function guardarCarrera() {
+      const nombreCarrera = document.getElementById('nombreCarrera').value;
+      const tiempoTotal = new Date(endTime - startTime - pausedDuration);
+      const horas = String(tiempoTotal.getUTCHours()).padStart(2, '0');
+      const minutos = String(tiempoTotal.getUTCMinutes()).padStart(2, '0');
+      const segundos = String(tiempoTotal.getUTCSeconds()).padStart(2, '0');
+      const ritmoPromedio = calcularRitmoPromedio();
+      const fechaCarrera = startTime.toLocaleDateString();
+      const horaInicio = startTime.toLocaleTimeString();
+
+      const carrera = {
+        nombreCarrera,
+        distanciaRecorrida: distanciaRecorrida.toFixed(2),
+        tiempoTotal: `${horas}:${minutos}:${segundos}`,
+        ritmoPromedio,
+        caloriasQuemadas: caloriasQuemadas.toFixed(0),
+        fechaCarrera,
+        horaInicio,
+      };
+
+      let carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
+      carrerasGuardadas.push(carrera);
+      localStorage.setItem('carrerasGuardadas', JSON.stringify(carrerasGuardadas));
+
+      alert('Carrera guardada exitosamente.');
+    }
+
+    function toggleCarrerasGuardadas() {
+      const contenedor = document.getElementById('carrerasGuardadas');
+      if (contenedor.style.display === 'none') {
+        let carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
+        let contenido = '<h3>Carreras Guardadas</h3>';
+        carrerasGuardadas.forEach((carrera, index) => {
+          contenido += `
+            <div>
+              <p><strong>Carrera ${index + 1}</strong></p>
+              <p><strong>Nombre:</strong> ${carrera.nombreCarrera}</p>
+              <p><strong>Fecha:</strong> ${carrera.fechaCarrera}</p>
+              <p><strong>Hora de Inicio:</strong> ${carrera.horaInicio}</p>
+              <p><strong>Distancia Recorrida:</strong> ${carrera.distanciaRecorrida} Km</p>
+              <p><strong>Tiempo Total:</strong> ${carrera.tiempoTotal}</p>
+              <p><strong>Ritmo Promedio:</strong> ${carrera.ritmoPromedio} min/km</p>
+              <p><strong>Calorías Quemadas:</strong> ${carrera.caloriasQuemadas} cal</p>
+            </div>
+          `;
+        });
+        contenedor.innerHTML = contenido;
+        contenedor.style.display = 'block';
+      } else {
+        contenedor.style.display = 'none';
+      }
     }
 
     function calcularRitmoObjetivo() {
@@ -324,104 +376,7 @@
       const tiempoObjetivoHoras = parseFloat(document.getElementById('tiempoObjetivoHoras').value);
       const tiempoObjetivoMinutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
       const tiempoObjetivoTotal = (tiempoObjetivoHoras * 60) + tiempoObjetivoMinutos;
-      return distanciaObjetivo > 0 && tiempoObjetivoTotal > 0 ? tiempoObjetivoTotal / distanciaObjetivo : 0;
-    }
-
-    function nuevaCarrera() {
-      if (confirm("¿Quieres guardar la carrera antes de empezar una nueva?")) {
-        guardarCarrera();
-      }
-      distanciaRecorrida = 0;
-      startTime = null;
-      endTime = null;
-      pausedDuration = 0;
-      document.getElementById('feedback').innerHTML = "";
-      document.getElementById('nombreCarrera').value = "";
-      document.getElementById('distanciaObjetivo').value = "0";
-      document.getElementById('tiempoObjetivoHoras').value = "0";
-      document.getElementById('tiempoObjetivoMinutos').value = "0";
-      document.getElementById('ritmoObjetivo').innerHTML = "";
-      path.setPath([]);
-      kmMarkers.forEach(marker => marker.setMap(null));
-      kmMarkers = [];
-      if (navigator.geolocation) {
-        navigator.geolocation.clearWatch(watchID);
-      }
-      clearInterval(timerInterval);
-      clearInterval(intervalID);
-    }
-
-    function guardarCarrera() {
-      const nombreCarrera = document.getElementById('nombreCarrera').value;
-      const now = new Date();
-      const tiempoTranscurrido = new Date(now - startTime - pausedDuration);
-      const horas = String(tiempoTranscurrido.getUTCHours()).padStart(2, '0');
-      const minutos = String(tiempoTranscurrido.getUTCMinutes()).padStart(2, '0');
-      const segundos = String(tiempoTranscurrido.getUTCSeconds()).padStart(2, '0');
-      const ritmoPromedio = calcularRitmoPromedio();
-      
-      const carrera = {
-        nombre: nombreCarrera,
-        fecha: now.toLocaleDateString(),
-        horaInicio: startTime.toLocaleTimeString(),
-        tiempo: `${horas}:${minutos}:${segundos}`,
-        distancia: distanciaRecorrida.toFixed(2),
-        ritmo: ritmoPromedio,
-        calorias: caloriasQuemadas.toFixed(0),
-        ruta: path.getPath().getArray().map(latlng => ({ lat: latlng.lat(), lng: latlng.lng() }))
-      };
-
-      let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
-      carrerasGuardadas.push(carrera);
-      localStorage.setItem('carreras', JSON.stringify(carrerasGuardadas));
-      alert("Carrera guardada exitosamente.");
-    }
-
-    function mostrarCarrerasGuardadas() {
-      const carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
-      if (carrerasGuardadas.length > 0) {
-        let html = "<h3>Carreras Guardadas:</h3>";
-        carrerasGuardadas.forEach(carrera => {
-          html += `
-            <p>
-              <strong>Nombre:</strong> ${carrera.nombre}<br>
-              <strong>Fecha:</strong> ${carrera.fecha}<br>
-              <strong>Hora de Inicio:</strong> ${carrera.horaInicio}<br>
-              <strong>Tiempo:</strong> ${carrera.tiempo}<br>
-              <strong>Distancia:</strong> ${carrera.distancia} km<br>
-              <strong>Ritmo Promedio:</strong> ${carrera.ritmo} min/km<br>
-              <strong>Calorías:</strong> ${carrera.calorias} cal
-            </p>
-            <hr>
-          `;
-        });
-        document.getElementById('feedback').innerHTML = html;
-      } else {
-        document.getElementById('feedback').innerHTML = "<p>No hay carreras guardadas.</p>";
-      }
-    }
-
-    function exportarGPX() {
-      const pathArray = path.getPath().getArray();
-      if (pathArray.length === 0) {
-        alert("No hay datos de ruta para exportar.");
-        return;
-      }
-      let gpx = '<?xml version="1.0" encoding="UTF-8"?>';
-      gpx += '<gpx version="1.1" creator="Running App">';
-      gpx += '<trk><trkseg>';
-      pathArray.forEach(latlng => {
-        gpx += `<trkpt lat="${latlng.lat()}" lon="${latlng.lng()}"></trkpt>`;
-      });
-      gpx += '</trkseg></trk></gpx>';
-
-      const blob = new Blob([gpx], { type: 'application/gpx+xml' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'ruta.gpx';
-      a.click();
-      URL.revokeObjectURL(url);
+      return (tiempoObjetivoTotal / distanciaObjetivo).toFixed(2);
     }
   </script>
 </body>
