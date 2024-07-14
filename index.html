@@ -456,17 +456,32 @@
           video.style.display = 'none';
           document.body.appendChild(video);
           video.srcObject = mediaStream;
+          video.play();
+
           video.onloadedmetadata = () => {
-            video.play();
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            foto = canvas.toDataURL('image/jpeg');
-            video.pause();
-            video.srcObject.getTracks().forEach(track => track.stop());
-            document.body.removeChild(video);
+            const button = document.createElement('button');
+            button.textContent = 'Capturar Foto';
+            button.style.display = 'block';
+            document.body.appendChild(button);
+
+            button.addEventListener('click', () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              const context = canvas.getContext('2d');
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+              const photoContainer = document.getElementById('photoContainer');
+              photoContainer.innerHTML = '';
+              const img = document.createElement('img');
+              img.src = canvas.toDataURL('image/jpeg');
+              photoContainer.appendChild(img);
+
+              video.pause();
+              video.srcObject.getTracks().forEach(track => track.stop());
+              document.body.removeChild(video);
+              document.body.removeChild(button);
+            });
           };
         })
         .catch(error => {
@@ -474,7 +489,6 @@
           alert('Error al acceder a la cámara. Verifica que tienes permiso para acceder y que la cámara está disponible.');
         });
     }
-
     function exportarGPX() {
     if (path.getPath().getLength() === 0) {
       alert("No hay datos de ruta para exportar.");
