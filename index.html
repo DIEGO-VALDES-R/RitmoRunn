@@ -97,10 +97,12 @@
     <h2>Versión de Prueba</h2>
     <div class="card">
       <input type="text" id="nombreCarrera" placeholder="Nombre de la carrera">
-      <input type="number" id="distanciaObjetivo" placeholder="Distancia objetivo (km)">
+      <h3>Distancia objetivo km</h3>
+      <input type="number" id="distanciaObjetivo" placeholder="Distancia objetivo (km)" value="0">
+      <h3>Distancia objetivo km</h3>
       <div class="time-input">
-        <input type="number" id="tiempoObjetivoHoras" placeholder="Tiempo objetivo (horas)">
-        <input type="number" id="tiempoObjetivoMinutos" placeholder="Tiempo objetivo (minutos)">
+        <input type="number" id="tiempoObjetivoHoras" placeholder="Tiempo objetivo (horas)" value="0">
+        <input type="number" id="tiempoObjetivoMinutos" placeholder="Tiempo objetivo (minutos)" value="0">
       </div>
       <button onclick="calcularRitmo()">Calcular Ritmo</button>
       <div id="ritmoObjetivo"></div>
