@@ -119,7 +119,8 @@
         <button onclick="nuevaCarrera()">Nueva Carrera</button>
       </div>
     </div>
-    
+        <div id="feedback" class="card"></div>
+        
     <div class="card">
       <div class="button-group">
         <button onclick="mostrarRitmosPorKm()">Analizar Ritmos</button>
@@ -132,7 +133,6 @@
       <button onclick="tomarFoto()">Tomar Foto</button>
     </div>
     
-    <div id="feedback" class="card"></div>
     <div id="carrerasGuardadas" class="card"></div>
     <div id="map"></div>
   </div>
@@ -261,22 +261,22 @@
     }
 
     function finalizarCarrera() {
-      endTime = new Date();
-      clearInterval(timerInterval);
-      clearInterval(intervalID);
-      if (navigator.geolocation) {
-        navigator.geolocation.clearWatch(watchID);
-      }
-      mostrarResultados();
-      
-      const ritmoObjetivo = calcularRitmoObjetivo();
-      const ritmoFinal = calcularRitmoPromedio();
-      if (ritmoFinal <= ritmoObjetivo) {
-        mostrarMensaje(`¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'achieved');
-      } else {
-        mostrarMensaje(`No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'not-achieved');
-      }
-    }
+  endTime = new Date();
+  clearInterval(timerInterval);
+  clearInterval(intervalID);
+  if (navigator.geolocation) {
+    navigator.geolocation.clearWatch(watchID);
+  }
+  mostrarResultados();
+  
+  const ritmoObjetivo = calcularRitmoObjetivo();
+  const ritmoFinal = calcularRitmoPromedio();
+  if (ritmoFinal <= ritmoObjetivo) {
+    mostrarMensaje(`¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km.`, 'achieved');
+  } else {
+    mostrarMensaje(`No alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km.`, 'not-achieved');
+  }
+}
 
     function nuevaCarrera() {
   if (confirm("¿Deseas guardar la carrera antes de borrarla?")) {
@@ -348,15 +348,17 @@
     }
 
     function updateFeedback() {
-      const elapsedTime = new Date(new Date() - startTime - pausedDuration);
-      const hours = elapsedTime.getUTCHours();
-      const minutes = elapsedTime.getUTCMinutes();
-      const seconds = elapsedTime.getUTCSeconds();
-      document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br>
-      Tiempo: ${hours}:${minutes}:${seconds}<br>
-      Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br>
-      Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km`;
-    }
+    const elapsedTime = new Date(new Date() - startTime - pausedDuration);
+    const hours = elapsedTime.getUTCHours();
+    const minutes = elapsedTime.getUTCMinutes();
+    const seconds = elapsedTime.getUTCSeconds();
+    const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br>
+    Tiempo: ${formattedTime}<br>
+    Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br>
+    Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km`;
+}
 
     function calcularRitmo() {
       const distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
@@ -381,11 +383,18 @@
     }
 
     function mostrarResultados() {
-      document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br>
-      Tiempo: ${(endTime - startTime - pausedDuration) / 1000 / 60} min<br>
-      Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br>
-      Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km`;
-    }
+    const elapsedTime = new Date(new Date() - startTime - pausedDuration);
+    const hours = elapsedTime.getUTCHours();
+    const minutes = elapsedTime.getUTCMinutes();
+    const seconds = elapsedTime.getUTCSeconds();
+    const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br>
+    Tiempo: ${formattedTime}<br>
+    Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br>
+    Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km`;
+}
+
 
     function checkRitmo() {
       const ritmoObjetivo = calcularRitmoObjetivo();
@@ -405,22 +414,22 @@
     }
 
     function guardarCarrera() {
-      const nombreCarrera = document.getElementById('nombreCarrera').value;
-      const fechaCarrera = new Date().toLocaleString();
-      const datosCarrera = {
-        nombre: nombreCarrera,
-        fecha: fechaCarrera,
-        distancia: distanciaRecorrida.toFixed(2),
-        tiempo: ((endTime - startTime - pausedDuration) / 1000 / 60).toFixed(2),
-        ritmo: calcularRitmoPromedio().toFixed(2),
-        calorias: caloriasQuemadas.toFixed(2),
-      };
-      const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
-      carrerasGuardadas.push(datosCarrera);
-      localStorage.setItem('carrerasGuardadas', JSON.stringify(carrerasGuardadas));
-      alert('Carrera guardada exitosamente');
-      mostrarCarrerasGuardadas();
-    }
+  const nombreCarrera = document.getElementById('nombreCarrera').value;
+  const fechaCarrera = new Date().toLocaleString();
+  const datosCarrera = {
+    nombre: nombreCarrera,
+    fecha: fechaCarrera,
+    distancia: distanciaRecorrida.toFixed(2),
+    tiempo: Math.floor((endTime - startTime - pausedDuration) / 1000 / 60),
+    ritmo: Math.floor(calcularRitmoPromedio()),
+    calorias: Math.floor(caloriasQuemadas),
+  };
+  const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
+  carrerasGuardadas.push(datosCarrera);
+  localStorage.setItem('carrerasGuardadas', JSON.stringify(carrerasGuardadas));
+  alert('Carrera guardada exitosamente');
+  mostrarCarrerasGuardadas();
+}
 
     function mostrarCarrerasGuardadas() {
       const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
