@@ -23,9 +23,9 @@
         }
         .card {
             background-color: #fff;
-            border-radius: 8px;
+            border-radius: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
+            padding: 10px;
             margin-bottom: 20px;
         }
         input, button {
@@ -33,7 +33,7 @@
             padding: 5px;
             margin: 5px 0;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 20px;
             box-sizing: border-box;
             text-align: center;
         }
@@ -96,18 +96,32 @@
         }
         footer {
             text-align: center;
-            margin-top: 20px;
-            padding: 10px;
+            margin: 10px auto 0;
+            padding: 0,5px;
             background-color: #112075;
             color: white;
-            border-radius: 8px;
+            border-radius: 20px;
+            font-size: 1em;
+            max-width: 90%;
         }
+      #creator-info {
+           position: fixed;
+           top: 10px;
+           left: 50%;
+           transform: translateX(-0%);
+           background-color: rgba(17, 32, 117, 0.8);
+           color: white;
+           padding: 5px 10px;
+           border-radius: 4px;
+           font-size: 0.8em;
+           z-index: 1000;
+    }
     </style>
 </head>
 <body>
+    <div id="creator-info">Desarrollada por Diego Valdés</div>
     <div class="container">
         <h1>Alcanza tu ritmo</h1>
-        <h2>Versión de prueba</h2>
         <div class="card">
             <input type="text" id="nombreCarrera" placeholder="Nombre de la carrera">
             <h3>Distancia objetivo km</h3>
@@ -146,7 +160,7 @@
         <div id="carrerasGuardadas" class="card"></div>
         <div id="map"></div>
         <footer>
-            <p>Aplicación creada por Diego Valdés</p>
+            <p>Versión de Prueba</p>
         </footer>
     </div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&callback=initMap" async defer></script>
