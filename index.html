@@ -94,6 +94,14 @@
             padding: 5px 10px;
             margin: 5px;
         }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #112075;
+            color: white;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -137,6 +145,9 @@
         </div>
         <div id="carrerasGuardadas" class="card"></div>
         <div id="map"></div>
+        <footer>
+            <p>Aplicación creada por Diego Valdés</p>
+        </footer>
     </div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&callback=initMap" async defer></script>
     <script>
@@ -397,10 +408,10 @@
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoPromedio = calcularRitmoPromedio();
             if (ritmoPromedio <= ritmoObjetivo) {
-                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte asi y lograras tu obejtivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} `);
+                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así y lograrás tu obejtivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} `);
                 speechSynthesis.speak(utterance);
             } else {
-                utterance = new SpeechSynthesisUtterance(`¡Corre un poco mas rapido, si sigue así no lograras tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} `);
+                utterance = new SpeechSynthesisUtterance(`¡Corre un poco mas rapido, si sigue así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} `);
                 speechSynthesis.speak(utterance);
                 ritmoAlcanzado = false;
             }
