@@ -165,312 +165,316 @@
     </div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&callback=initMap" async defer></script>
     <script>
-let map, marker, path;
-let startTime, endTime, timerInterval;
-let distanciaRecorrida = 0;
-let watchID;
-let isPaused = false;
-let pausedTime, pausedDuration = 0;
-let kmMarkers = [];
-let caloriasQuemadas = 0;
-const CALORIAS_POR_KM = 60;
-let speechSynthesis = window.speechSynthesis;
-let utterance;
-let ritmoAlcanzado = true;
-let intervalID;
-let foto;
-let carreraGuardada = false;
-let pathArray = [];
+        let map, marker, path;
+        let startTime, endTime, timerInterval;
+        let distanciaRecorrida = 0;
+        let watchID;
+        let isPaused = false;
+        let pausedTime, pausedDuration = 0;
+        let kmMarkers = [];
+        let caloriasQuemadas = 0;
+        const CALORIAS_POR_KM = 60;
+        let speechSynthesis = window.speechSynthesis;
+        let utterance;
+        let ritmoAlcanzado = true;
+        let intervalID;
+        let foto;
+        let carreraGuardada = false;
 
-function iniciarCarrera() {
-    if (navigator.geolocation) {
-        if (!isPaused) {
-            startTime = new Date();
+        function startCountdown() {
+            const counterElement = document.getElementById('counter');
+            let counter = 5;
+            counterElement.style.display = 'flex';
+            counterElement.textContent = counter;
+            const countdownInterval = setInterval(() => {
+                counter--;
+                if (counter === 0) {
+                    clearInterval(countdownInterval);
+                    counterElement.style.display = 'none';
+                    startRunning();
+                    speak("Inicia la carrera");
+                } else {
+                    counterElement.textContent = counter;
+                }
+            }, 1000);
+        }
+
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(msg);
+        }
+
+        function startRunning() {
+            if (!isRunning) {
+                isRunning = true;
+                startTime = new Date();
+                if (isPaused) {
+                    pausedDuration += new Date() - pausedTime;
+                }
+                isPaused = false;
+                document.getElementById('pausarBtn').classList.remove('active');
+                document.getElementById('iniciarBtn').classList.add('active');
+                watchID = navigator.geolocation.watchPosition(updateLocation, handleError, {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 5000,
+                });
+                intervalID = setInterval(updateFeedback, 1000);
+            }
+        }
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 15,
+            });
+            marker = new google.maps.Marker({
+                map: map,
+                title: 'Tu ubicación actual',
+            });
+            path = new google.maps.Polyline({
+                map: map,
+                path: [],
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+        }
+
+        function iniciarCarrera() {
+            if (navigator.geolocation) {
+                if (!isPaused) {
+                    startTime = new Date();
+                    distanciaRecorrida = 0;
+                    caloriasQuemadas = 0;
+                    pausedDuration = 0;
+                    document.getElementById('feedback').innerHTML = "";
+                } else {
+                    pausedDuration += (new Date() - pausedTime);
+                }
+                isPaused = false;
+                watchID = navigator.geolocation.watchPosition(updateLocation, handleError, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                });
+                timerInterval = setInterval(updateFeedback, 1000);
+                intervalID = setInterval(checkRitmo, 30000);
+                document.getElementById('iniciarBtn').classList.add('active');
+                document.getElementById('pausarBtn').classList.remove('active');
+                document.getElementById('pausarBtn').textContent = 'Pausar Carrera';
+            } else {
+                alert("La geolocalización no es soportada por este navegador.");
+            }
+                  }
+
+        function pausarReanudarCarrera() {
+            if (!isPaused) {
+                clearInterval(timerInterval);
+                clearInterval(intervalID);
+                if (navigator.geolocation) {
+                    navigator.geolocation.clearWatch(watchID);
+                }
+                pausedTime = new Date();
+                isPaused = true;
+                document.getElementById('pausarBtn').textContent = 'Reanudar Carrera';
+                document.getElementById('pausarBtn').classList.add('active');
+                document.getElementById('iniciarBtn').classList.remove('active');
+            } else {
+                iniciarCarrera();
+            }
+        }
+
+        function finalizarCarrera() {
+            endTime = new Date();
+            clearInterval(timerInterval);
+            clearInterval(intervalID);
+            if (navigator.geolocation) {
+                navigator.geolocation.clearWatch(watchID);
+            }
+            mostrarResultados();
+            const ritmoObjetivo = calcularRitmoObjetivo();
+            const ritmoFinal = calcularRitmoPromedio();
+            if (ritmoFinal <= ritmoObjetivo) {
+                mostrarMensaje(`¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km.`, 'achieved');
+            } else {
+                mostrarMensaje(`No alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km.`, 'not-achieved');
+            }
+        }
+
+        function nuevaCarrera() {
+            if (!carreraGuardada) {
+                if (confirm("¿Quieres guardar la carrera antes de borrarla?")) {
+                    guardarCarrera();
+                } else {
+                    resetearCarrera();
+                }
+            } else {
+                resetearCarrera();
+            }
+        }
+
+        function resetearCarrera() {
+            document.getElementById('feedback').innerHTML = "";
+            document.getElementById('ritmoObjetivo').innerHTML = "";
+            document.getElementById('distanciaObjetivo').value = "0";
+            document.getElementById('tiempoObjetivoHoras').value = "0";
+            document.getElementById('tiempoObjetivoMinutos').value = "0";
+            document.getElementById('nombreCarrera').value = "";
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 15,
+            });
+            path = new google.maps.Polyline({
+                map: map,
+                path: [],
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+            clearInterval(timerInterval);
+            clearInterval(intervalID);
+            if (navigator.geolocation) {
+                navigator.geolocation.clearWatch(watchID);
+            }
             distanciaRecorrida = 0;
             caloriasQuemadas = 0;
+            isPaused = false;
             pausedDuration = 0;
-            pathArray = [];
-            document.getElementById('feedback').innerHTML = "";
-        } else {
-            pausedDuration += (new Date() - pausedTime);
+            kmMarkers = [];
+            document.getElementById('iniciarBtn').classList.remove('active');
+            document.getElementById('pausarBtn').classList.remove('active');
+            document.getElementById('pausarBtn').textContent = 'Pausar Carrera';
+            carreraGuardada = false; // Resetear el estado guardado
         }
-        isPaused = false;
-        watchID = navigator.geolocation.watchPosition(updateLocation, handleError, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
-        });
-        timerInterval = setInterval(updateFeedback, 1000);
-        intervalID = setInterval(checkRitmo, 30000);
-        document.getElementById('iniciarBtn').classList.add('active');
-        document.getElementById('pausarBtn').classList.remove('active');
-        document.getElementById('pausarBtn').textContent = 'Pausar Carrera';
-    } else {
-        alert("La geolocalización no es soportada por este navegador.");
-    }
-}
 
-function exportarGPX() {
-    if (pathArray.length > 0) {
-        const gpxContent = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="RunnersPace Pro">
-  <metadata>
-    <name>Ruta Guardada</name>
-    <time>${new Date().toISOString()}</time>
-  </metadata>
-  <trk>
-    <name>Ruta Guardada</name>
-    <trkseg>
-      ${pathArray.map(latlng => `<trkpt lat="${latlng.lat()}" lon="${latlng.lng()}"></trkpt>`).join('\n')}
-    </trkseg>
-    <extensions>
-      <gpxtpx:TrackPointExtension xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1">
-        <gpxtpx:speed>${distanciaRecorrida / ((endTime - startTime - pausedDuration) / 1000)}</gpxtpx:speed>
-        <gpxtpx:hr>${Math.floor(Math.random() * (200 - 60) + 60)}</gpxtpx:hr>
-        <gpxtpx:cad>${Math.floor(Math.random() * (180 - 60) + 60)}</gpxtpx:cad>
-      </gpxtpx:TrackPointExtension>
-    </extensions>
-  </trk>
-</gpx>`;
-
-        const blob = new Blob([gpxContent], { type: 'application/gpx+xml' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'ruta.gpx';
-        link.click();
-        URL.revokeObjectURL(url);
-    } else {
-        alert("No hay una ruta disponible para exportar.");
-    }
-}
-
-function pausarReanudarCarrera() {
-    if (!isPaused) {
-        clearInterval(timerInterval);
-        clearInterval(intervalID);
-        if (navigator.geolocation) {
-            navigator.geolocation.clearWatch(watchID);
+        function updateLocation(position) {
+            const { latitude, longitude } = position.coords;
+            const currentLocation = new google.maps.LatLng(latitude, longitude);
+            path.getPath().push(currentLocation);
+            map.panTo(currentLocation);
+            marker.setPosition(currentLocation);
+            if (path.getPath().getLength() > 1) {
+                const previousLocation = path.getPath().getAt(path.getPath().getLength() - 2);
+                distanciaRecorrida += google.maps.geometry.spherical.computeDistanceBetween(previousLocation, currentLocation) / 1000;
+                console.log(`Distancia Recorrida: ${distanciaRecorrida}`);
+                caloriasQuemadas = distanciaRecorrida * CALORIAS_POR_KM;
+            }
+            checkKmMarkers(currentLocation);
         }
-        pausedTime = new Date();
-        isPaused = true;
-        document.getElementById('pausarBtn').textContent = 'Reanudar Carrera';
-        document.getElementById('pausarBtn').classList.add('active');
-        document.getElementById('iniciarBtn').classList.remove('active');
-    } else {
-        iniciarCarrera();
-    }
-}
 
-function finalizarCarrera() {
-    endTime = new Date();
-    clearInterval(timerInterval);
-    clearInterval(intervalID);
-    if (navigator.geolocation) {
-        navigator.geolocation.clearWatch(watchID);
-    }
-    mostrarResultados();
-    const ritmoObjetivo = calcularRitmoObjetivo();
-    const ritmoFinal = calcularRitmoPromedio();
-    if (ritmoFinal <= ritmoObjetivo) {
-        mostrarMensaje(`¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km.`, 'achieved');
-    } else {
-        mostrarMensaje(`No alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km.`, 'not-achieved');
-    }
-}
-
-function nuevaCarrera() {
-    if (!carreraGuardada) {
-        if (confirm("¿Quieres guardar la carrera antes de borrarla?")) {
-            guardarCarrera();
-        } else {
-            resetearCarrera();
+        function checkKmMarkers(currentLocation) {
+            const kmMark = Math.floor(distanciaRecorrida);
+            if (kmMarkers.length < kmMark) {
+                kmMarkers.push(currentLocation);
+                utterance = new SpeechSynthesisUtterance(`¡Has completado ${kmMark} kilómetros!`);
+                speechSynthesis.speak(utterance);
+            }
         }
-    } else {
-        resetearCarrera();
-    }
-}
 
-function resetearCarrera() {
-    document.getElementById('feedback').innerHTML = "";
-    document.getElementById('ritmoObjetivo').innerHTML = "";
-    document.getElementById('distanciaObjetivo').value = "0";
-    document.getElementById('tiempoObjetivoHoras').value = "0";
-    document.getElementById('tiempoObjetivoMinutos').value = "0";
-    document.getElementById('nombreCarrera').value = "";
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 15,
-    });
-    path = new google.maps.Polyline({
-        map: map,
-        path: [],
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2,
-    });
-    clearInterval(timerInterval);
-    clearInterval(intervalID);
-    if (navigator.geolocation) {
-        navigator.geolocation.clearWatch(watchID);
-    }
-    distanciaRecorrida = 0;
-    caloriasQuemadas = 0;
-    isPaused = false;
-    pausedDuration = 0;
-    kmMarkers = [];
-    document.getElementById('iniciarBtn').classList.remove('active');
-    document.getElementById('pausarBtn').classList.remove('active');
-    document.getElementById('pausarBtn').textContent = 'Pausar Carrera';
-    carreraGuardada = false; // Resetear el estado guardado
-}
+        function handleError(error) {
+            console.error(`Error: ${error.message}`);
+        }
 
-function updateLocation(position) {
-    const latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-    pathArray.push(latlng);
-    marker.setPosition(latlng);
-    map.panTo(latlng);
-    path.getPath().push(latlng);
-    distanciaRecorrida += google.maps.geometry.spherical.computeDistanceBetween(
-        path.getPath().getAt(path.getPath().length - 2) || latlng,
-        latlng
-    );
-    caloriasQuemadas += CALORIAS_POR_KM * (distanciaRecorrida / 1000);
-    updateFeedback();
-}
+        function updateFeedback() {
+            const elapsedTime = new Date(new Date() - startTime - pausedDuration);
+            const hours = elapsedTime.getUTCHours();
+            const minutes = elapsedTime.getUTCMinutes();
+            const seconds = elapsedTime.getUTCSeconds();
+            const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km`;
+        }
 
-function handleError(error) {
-    console.error(`Error: ${error.message}`);
-}
+        function calcularRitmo() {
+            const distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
+            const tiempoObjetivoHoras = parseFloat(document.getElementById('tiempoObjetivoHoras').value);
+            const tiempoObjetivoMinutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
+            const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
+            const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
+            document.getElementById('ritmoObjetivo').innerHTML = `Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km`;
+        }
 
-function updateFeedback() {
-    const elapsedTime = new Date() - startTime - pausedDuration;
-    const distanciaKm = distanciaRecorrida / 1000;
-    const velocidad = distanciaKm / (elapsedTime / 1000 / 60 / 60);
-    const feedback = `
-        Distancia recorrida: ${distanciaKm.toFixed(2)} km<br>
-        Tiempo transcurrido: ${formatTime(elapsedTime)}<br>
-        Velocidad promedio: ${velocidad.toFixed(2)} km/h<br>
-        Calorías quemadas: ${caloriasQuemadas.toFixed(0)}
-    `;
-    document.getElementById('feedback').innerHTML = feedback;
-}
+        function calcularRitmoObjetivo() {
+            const distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
+            const tiempoObjetivoHoras = parseFloat(document.getElementById('tiempoObjetivoHoras').value);
+            const tiempoObjetivoMinutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
+            const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
+            return tiempoObjetivoTotal / distanciaObjetivo;
+        }
 
-function formatTime(ms) {
-    const hours = Math.floor(ms / (1000 * 60 * 60));
-    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
+        function calcularRitmoPromedio() {
+            const elapsedTime = (new Date() - startTime - pausedDuration) / 1000 / 60; // Convertir a minutos
+            return elapsedTime / distanciaRecorrida;
+        }
 
-function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 15,
-    });
-    marker = new google.maps.Marker({
-        map: map,
-        title: 'Tu ubicación actual',
-    });
-    path = new google.maps.Polyline({
-        map: map,
-        path: [],
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2,
-    });
-}
+        function mostrarResultados() {
+            const elapsedTime = new Date(new Date() - startTime - pausedDuration);
+            const hours = elapsedTime.getUTCHours();
+            const minutes = elapsedTime.getUTCMinutes();
+            const seconds = elapsedTime.getUTCSeconds();
+            const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km`;
+        }
 
-function calcularRitmo() {
-    const distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
-    const tiempoObjetivoHoras = parseFloat(document.getElementById('tiempoObjetivoHoras').value);
-    const tiempoObjetivoMinutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
-    const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
-    const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
-    document.getElementById('ritmoObjetivo').innerHTML = `Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km`;
-}
+        function checkRitmo() {
+            const ritmoObjetivo = calcularRitmoObjetivo();
+            const ritmoPromedio = calcularRitmoPromedio();
+            if (ritmoPromedio <= ritmoObjetivo) {
+                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así y lograrás tu obejtivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} `);
+                speechSynthesis.speak(utterance);
+            } else {
+                utterance = new SpeechSynthesisUtterance(`¡Corre un poco mas rapido, si sigue así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} `);
+                speechSynthesis.speak(utterance);
+                ritmoAlcanzado = false;
+            }
+        }
 
-function calcularRitmoObjetivo() {
-    const distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
-    const tiempoObjetivoHoras = parseFloat(document.getElementById('tiempoObjetivoHoras').value);
-    const tiempoObjetivoMinutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
-    const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
-    return tiempoObjetivoTotal / distanciaObjetivo;
-}
+        function mostrarMensaje(mensaje, clase) {
+            document.getElementById('feedback').innerHTML += `<div class="${clase}">${mensaje}</div>`;
+        }
 
-function calcularRitmoPromedio() {
-    const elapsedTime = (new Date() - startTime - pausedDuration) / 1000 / 60; // Convertir a minutos
-    return elapsedTime / distanciaRecorrida;
-}
+        function guardarCarrera() {
+            const nombreCarrera = document.getElementById('nombreCarrera').value;
+            const fechaCarrera = new Date().toLocaleString();
+            const datosCarrera = {
+                nombre: nombreCarrera,
+                fecha: fechaCarrera,
+                distancia: distanciaRecorrida.toFixed(2),
+                tiempo: Math.floor((endTime - startTime - pausedDuration) / 1000 / 60),
+                ritmo: Math.floor(calcularRitmoPromedio()),
+                calorias: Math.floor(caloriasQuemadas),
+            };
+            const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
+            carrerasGuardadas.push(datosCarrera);
+            localStorage.setItem('carrerasGuardadas', JSON.stringify(carrerasGuardadas));
+            alert('Carrera guardada exitosamente');
+            mostrarCarrerasGuardadas();
+            carreraGuardada = true;
+        }
 
-function mostrarResultados() {
-    const elapsedTime = new Date(new Date() - startTime - pausedDuration);
-    const hours = elapsedTime.getUTCHours();
-    const minutes = elapsedTime.getUTCMinutes();
-    const seconds = elapsedTime.getUTCSeconds();
-    const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km`;
-}
+        function mostrarCarrerasGuardadas() {
+            const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
+            const contenedorCarreras = document.getElementById('carrerasGuardadas');
+            contenedorCarreras.innerHTML = '';
+            carrerasGuardadas.forEach((carrera, index) => {
+                const carreraDiv = document.createElement('div');
+                carreraDiv.classList.add('carrera-guardada');
+                carreraDiv.innerHTML = `
+                    <h4>${carrera.nombre}</h4>
+                    <p>Fecha: ${carrera.fecha}</p>
+                    <p>Distancia: ${carrera.distancia} km</p>
+                    <p>Tiempo: ${carrera.tiempo} min</p>
+                    <p>Ritmo: ${carrera.ritmo} min/km</p>
+                    <p>Calorías: ${carrera.calorias} kcal</p>
+                    <button onclick="eliminarCarrera(${index})">Eliminar</button>
+                `;
+                contenedorCarreras.appendChild(carreraDiv);
+            });
+        }
 
-function checkRitmo() {
-    const ritmoObjetivo = calcularRitmoObjetivo();
-    const ritmoPromedio = calcularRitmoPromedio();
-    if (ritmoPromedio <= ritmoObjetivo) {
-        utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así y lograrás tu obejtivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} `);
-        speechSynthesis.speak(utterance);
-    } else {
-        utterance = new SpeechSynthesisUtterance(`¡Corre un poco mas rapido, si sigue así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} `);
-        speechSynthesis.speak(utterance);
-        ritmoAlcanzado = false;
-    }
-}
-
-function mostrarMensaje(mensaje, clase) {
-    document.getElementById('feedback').innerHTML += `<div class="${clase}">${mensaje}</div>`;
-}
-
-function guardarCarrera() {
-    const nombreCarrera = document.getElementById('nombreCarrera').value;
-    const fechaCarrera = new Date().toLocaleString();
-    const datosCarrera = {
-        nombre: nombreCarrera,
-        fecha: fechaCarrera,
-        distancia: distanciaRecorrida.toFixed(2),
-        tiempo: Math.floor((endTime - startTime - pausedDuration) / 1000 / 60),
-        ritmo: Math.floor(calcularRitmoPromedio()),
-        calorias: Math.floor(caloriasQuemadas),
-    };
-    const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
-    carrerasGuardadas.push(datosCarrera);
-    localStorage.setItem('carrerasGuardadas', JSON.stringify(carrerasGuardadas));
-    alert('Carrera guardada exitosamente');
-    mostrarCarrerasGuardadas();
-    carreraGuardada = true;
-}
-
-function mostrarCarrerasGuardadas() {
-    const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
-    const contenedorCarreras = document.getElementById('carrerasGuardadas');
-    contenedorCarreras.innerHTML = '';
-    carrerasGuardadas.forEach((carrera, index) => {
-        const carreraDiv = document.createElement('div');
-        carreraDiv.classList.add('carrera-guardada');
-        carreraDiv.innerHTML = `
-            <h4>${carrera.nombre}</h4>
-            <p>Fecha: ${carrera.fecha}</p>
-            <p>Distancia: ${carrera.distancia} km</p>
-            <p>Tiempo: ${carrera.tiempo} min</p>
-            <p>Ritmo: ${carrera.ritmo} min/km</p>
-            <p>Calorías: ${carrera.calorias} kcal</p>
-            <button onclick="eliminarCarrera(${index})">Eliminar</button>
-        `;
-        contenedorCarreras.appendChild(carreraDiv);
-    });
-}
-
-function eliminarCarrera(index) {
+        function eliminarCarrera(index) {
             const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
             carrerasGuardadas.splice(index, 1);
             localStorage.setItem('carrerasGuardadas', JSON.stringify(carrerasGuardadas));
@@ -486,7 +490,33 @@ function eliminarCarrera(index) {
                 contenedorCarreras.style.display = 'none';
             }
         }
-function tomarFoto() {
+
+        function exportarGPX() {
+            const gpxData = `
+                <gpx version="1.1" creator="RunnersPace Pro">
+                    <trk>
+                        <name>${document.getElementById('nombreCarrera').value}</name>
+                        <trkseg>
+                            ${path.getPath().getArray().map(point => `
+                                <trkpt lat="${point.lat()}" lon="${point.lng()}">
+                                    <ele>0</ele>
+                                    <time>${new Date().toISOString()}</time>
+                                </trkpt>
+                            `).join('')}
+                        </trkseg>
+                    </trk>
+                </gpx>
+            `;
+            const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${document.getElementById('nombreCarrera').value}.gpx`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function tomarFoto() {
       navigator.mediaDevices.getUserMedia({ video: true })
         .then(mediaStream => {
           const video = document.createElement('video');
