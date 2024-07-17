@@ -492,39 +492,29 @@
         }
 
         function exportarGPX() {
-    const nombreCarrera = document.getElementById('nombreCarrera').value || "Carrera sin nombre";
-    const fechaInicio = new Date(startTime).toISOString();
-    const gpxData = `
-        <?xml version="1.0" encoding="UTF-8"?>
-        <gpx xmlns="http://www.topografix.com/GPX/1/1" creator="RunnersPace Pro" version="1.1" 
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
-            <metadata>
-                <name>${nombreCarrera}</name>
-                <time>${fechaInicio}</time>
-            </metadata>
-            <trk>
-                <name>${nombreCarrera}</name>
-                <desc>Carrera exportada desde RunnersPace Pro</desc>
-                <trkseg>
-                    ${path.getPath().getArray().map(point => `
-                        <trkpt lat="${point.lat()}" lon="${point.lng()}">
-                            <ele>0</ele>
-                            <time>${new Date(point.getTime()).toISOString()}</time>
-                        </trkpt>
-                    `).join('')}
-                </trkseg>
-            </trk>
-        </gpx>
-    `;
-    const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${nombreCarrera}.gpx`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
+            const gpxData = `
+                <gpx version="1.1" creator="RunnersPace Pro">
+                    <trk>
+                        <name>${document.getElementById('nombreCarrera').value}</name>
+                        <trkseg>
+                            ${path.getPath().getArray().map(point => `
+                                <trkpt lat="${point.lat()}" lon="${point.lng()}">
+                                    <ele>0</ele>
+                                    <time>${new Date().toISOString()}</time>
+                                </trkpt>
+                            `).join('')}
+                        </trkseg>
+                    </trk>
+                </gpx>
+            `;
+            const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${document.getElementById('nombreCarrera').value}.gpx`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
 
         function tomarFoto() {
       navigator.mediaDevices.getUserMedia({ video: true })
