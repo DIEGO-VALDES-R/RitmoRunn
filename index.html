@@ -496,7 +496,7 @@
     const fechaInicio = new Date(startTime).toISOString();
     const gpxData = `
         <?xml version="1.0" encoding="UTF-8"?>
-        <gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" creator="RunnersPace Pro" version="1.1">
+        <gpx xmlns="http://www.topografix.com/GPX/1/1" creator="RunnersPace Pro" version="1.1">
             <trk>
                 <name>${nombreCarrera}</name>
                 <desc>Carrera exportada desde RunnersPace Pro</desc>
@@ -504,7 +504,7 @@
                     ${path.getPath().getArray().map(point => `
                         <trkpt lat="${point.lat()}" lon="${point.lng()}">
                             <ele>0</ele>
-                            <time>${fechaInicio}</time>
+                            <time>${new Date().toISOString()}</time>
                         </trkpt>
                     `).join('')}
                 </trkseg>
