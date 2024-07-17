@@ -492,21 +492,18 @@
         }
 
         function exportarGPX() {
-            const gpxData = `
-                <gpx version="1.1" creator="RunnersPace Pro">
-                    <trk>
-                        <name>${document.getElementById('nombreCarrera').value}</name>
-                        <trkseg>
-                            ${path.getPath().getArray().map(point => `
-                                <trkpt lat="${point.lat()}" lon="${point.lng()}">
-                                    <ele>0</ele>
-                                    <time>${new Date().toISOString()}</time>
-                                </trkpt>
-                            `).join('')}
-                        </trkseg>
-                    </trk>
-                </gpx>
-            `;
+              const pathArray = path.getPath().getArray();
+              if (pathArray.length === 0) {
+            alert("No hay datos de ruta para exportar.");
+            return;
+          }
+              let gpx = '<?xml version="1.0" encoding="UTF-8"?>';
+                  gpx += '<gpx version="1.1" creator="Running App">';
+                    gpx += '<trk><trkseg>';
+                  pathArray.forEach(latlng => {
+                    gpx += `<trkpt lat="${latlng.lat()}" lon="${latlng.lng()}"></trkpt>`;
+                  });
+                  gpx += '</trkseg></trk></gpx>';
             const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
