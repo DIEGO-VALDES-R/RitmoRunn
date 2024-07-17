@@ -492,29 +492,33 @@
         }
 
         function exportarGPX() {
-            const gpxData = `
-                <gpx version="1.1" creator="RunnersPace Pro">
-                    <trk>
-                        <name>${document.getElementById('nombreCarrera').value}</name>
-                        <trkseg>
-                            ${path.getPath().getArray().map(point => `
-                                <trkpt lat="${point.lat()}" lon="${point.lng()}">
-                                    <ele>0</ele>
-                                    <time>${new Date().toISOString()}</time>
-                                </trkpt>
-                            `).join('')}
-                        </trkseg>
-                    </trk>
-                </gpx>
-            `;
-            const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${document.getElementById('nombreCarrera').value}.gpx`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
+    const nombreCarrera = document.getElementById('nombreCarrera').value || "Carrera sin nombre";
+    const fechaInicio = new Date(startTime).toISOString();
+    const gpxData = `
+        <?xml version="1.0" encoding="UTF-8"?>
+        <gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" creator="RunnersPace Pro" version="1.1">
+            <trk>
+                <name>${nombreCarrera}</name>
+                <desc>Carrera exportada desde RunnersPace Pro</desc>
+                <trkseg>
+                    ${path.getPath().getArray().map(point => `
+                        <trkpt lat="${point.lat()}" lon="${point.lng()}">
+                            <ele>0</ele>
+                            <time>${fechaInicio}</time>
+                        </trkpt>
+                    `).join('')}
+                </trkseg>
+            </trk>
+        </gpx>
+    `;
+    const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${nombreCarrera}.gpx`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
 
         function tomarFoto() {
       navigator.mediaDevices.getUserMedia({ video: true })
