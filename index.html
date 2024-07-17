@@ -492,31 +492,34 @@
         }
 
         function exportarGPX() {
-            const pathArray = path.getPath().getArray();
-            if (pathArray.length === 0) {
-                alert("No hay datos de ruta para exportar.");
-                return;
-            }
-            let gpx = '<?xml version="1.0" encoding="UTF-8"?>';
-            gpx += '<gpx version="1.1" creator="Running App">';
-            gpx += '<trk><trkseg>';
-            pathArray.forEach(latlng => {
-                gpx += `<trkpt lat="${latlng.lat()}" lon="${latlng.lng()}"></trkpt>`;
-            });
-            gpx += '</trkseg></trk></gpx>';
+      const pathArray = path.getPath();
+      let gpxData = `<?xml version="1.0" encoding="UTF-8"?>
+      <gpx xmlns="http://www.topografix.com/GPX/1/1">
+        <trk>
+          <name>Recorrido de Carrera</name>
+          <trkseg>\n`;
 
-            const blob = new Blob([gpx], { type: 'application/gpx+xml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'ruta.gpx';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
+      for (let i = 0; i < pathArray.getLength(); i++) {
+        const point = pathArray.getAt(i);
+        gpxData += `            <trkpt lat="${point.lat()}" lon="${point.lng()}">\n`;
+        gpxData += `                <ele>0.0</ele>\n`;
+        gpxData += `            </trkpt>\n`;
+      }
 
-        document.addEventListener("DOMContentLoaded", initMap);
+      gpxData += `          </trkseg>
+        </trk>
+      </gpx>`;
+
+      const blob = new Blob([gpxData], { type: 'text/xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'recorrido.gpx';
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+    }
 
         function tomarFoto() {
       navigator.mediaDevices.getUserMedia({ video: true })
