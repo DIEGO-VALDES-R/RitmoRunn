@@ -287,9 +287,9 @@
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoFinal = calcularRitmoPromedio();
             if (ritmoFinal <= ritmoObjetivo) {
-                mostrarMensaje(`¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km.`, 'achieved');
+                mostrarMensaje(¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km., 'achieved');
             } else {
-                mostrarMensaje(`No alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km.`, 'not-achieved');
+                mostrarMensaje(No alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km., 'not-achieved');
             }
         }
 
@@ -349,7 +349,7 @@
             if (path.getPath().getLength() > 1) {
                 const previousLocation = path.getPath().getAt(path.getPath().getLength() - 2);
                 distanciaRecorrida += google.maps.geometry.spherical.computeDistanceBetween(previousLocation, currentLocation) / 1000;
-                console.log(`Distancia Recorrida: ${distanciaRecorrida}`);
+                console.log(Distancia Recorrida: ${distanciaRecorrida});
                 caloriasQuemadas = distanciaRecorrida * CALORIAS_POR_KM;
             }
             checkKmMarkers(currentLocation);
@@ -359,13 +359,13 @@
             const kmMark = Math.floor(distanciaRecorrida);
             if (kmMarkers.length < kmMark) {
                 kmMarkers.push(currentLocation);
-                utterance = new SpeechSynthesisUtterance(`¡Has completado ${kmMark} kilómetros!`);
+                utterance = new SpeechSynthesisUtterance(¡Has completado ${kmMark} kilómetros!);
                 speechSynthesis.speak(utterance);
             }
         }
 
         function handleError(error) {
-            console.error(`Error: ${error.message}`);
+            console.error(Error: ${error.message});
         }
 
         function updateFeedback() {
@@ -373,8 +373,8 @@
             const hours = elapsedTime.getUTCHours();
             const minutes = elapsedTime.getUTCMinutes();
             const seconds = elapsedTime.getUTCSeconds();
-            const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km`;
+            const formattedTime = ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
+            document.getElementById('feedback').innerHTML = Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km;
         }
 
         function calcularRitmo() {
@@ -383,7 +383,7 @@
             const tiempoObjetivoMinutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
             const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
             const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
-            document.getElementById('ritmoObjetivo').innerHTML = `Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km`;
+            document.getElementById('ritmoObjetivo').innerHTML = Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km;
         }
 
         function calcularRitmoObjetivo() {
@@ -404,8 +404,8 @@
             const hours = elapsedTime.getUTCHours();
             const minutes = elapsedTime.getUTCMinutes();
             const seconds = elapsedTime.getUTCSeconds();
-            const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km`;
+            const formattedTime = ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
+            document.getElementById('feedback').innerHTML = Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km;
         }
 
         function checkRitmo() {
@@ -422,7 +422,7 @@
         }
 
         function mostrarMensaje(mensaje, clase) {
-            document.getElementById('feedback').innerHTML += `<div class="${clase}">${mensaje}</div>`;
+            document.getElementById('feedback').innerHTML += <div class="${clase}">${mensaje}</div>;
         }
 
         function guardarCarrera() {
@@ -502,34 +502,33 @@
         }
 
         function exportarGPX() {
-      const pathArray = path.getPath();
-      let gpxData = `<?xml version="1.0" encoding="UTF-8"?>
-      <gpx xmlns="http://www.topografix.com/GPX/1/1">
-        <trk>
-          <name>Recorrido de Carrera</name>
-          <trkseg>\n`;
-
-      for (let i = 0; i < pathArray.getLength(); i++) {
-        const point = pathArray.getAt(i);
-        gpxData += `            <trkpt lat="${point.lat()}" lon="${point.lng()}">\n`;
-        gpxData += `                <ele>0.0</ele>\n`;
-        gpxData += `            </trkpt>\n`;
-      }
-
-      gpxData += `          </trkseg>
-        </trk>
-      </gpx>`;
-
-      const blob = new Blob([gpxData], { type: 'text/xml' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'recorrido.gpx';
-      document.body.appendChild(a);
-      a.click();
-      URL.revokeObjectURL(url);
-    }
+    const gpxData = `
+        <gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">
+            <metadata>
+                <name>${document.getElementById('nombreCarrera').value}</name>
+                <time>${new Date().toISOString()}</time>
+            </metadata>
+            <trk>
+                <name>${document.getElementById('nombreCarrera').value}</name>
+                <trkseg>
+                    ${path.getPath().getArray().map((point, index) => `
+                        <trkpt lat="${point.lat()}" lon="${point.lng()}">
+                            <ele>${getElevationForPoint(point)}</ele>
+                            <time>${getTimestampForPoint(index)}</time>
+                        </trkpt>
+                    `).join('')}
+                </trkseg>
+            </trk>
+        </gpx>
+    `;
+    const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = ${document.getElementById('nombreCarrera').value}.gpx;
+    a.click();
+    URL.revokeObjectURL(url);
+}
 
         function tomarFoto() {
       navigator.mediaDevices.getUserMedia({ video: true })
