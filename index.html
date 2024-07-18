@@ -478,29 +478,45 @@
         }
 
         function exportarGPX() {
-            const gpxData = `
-                <gpx version="1.1" creator="RunnersPace Pro">
-                    <trk>
-                        <name>${document.getElementById('nombreCarrera').value}</name>
-                        <trkseg>
-                            ${path.getPath().getArray().map(point => `
-                                <trkpt lat="${point.lat()}" lon="${point.lng()}">
-                                    <ele>0</ele>
-                                    <time>${new Date().toISOString()}</time>
-                                </trkpt>
-                            `).join('')}
-                        </trkseg>
-                    </trk>
-                </gpx>
-            `;
-            const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${document.getElementById('nombreCarrera').value}.gpx`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
+    // Obtener la fecha y hora actual para el inicio de la ruta
+    const startTime = new Date();
+    
+    const gpxData = `
+        <gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">
+            <metadata>
+                <time>${startTime.toISOString()}</time>
+            </metadata>
+            <trk>
+                <name>${document.getElementById('nombreCarrera').value}</name>
+                <type>Running</type>
+                <trkseg>
+                    ${path.getPath().getArray().map((point, index) => {
+                        // Simular una elevación basada en el índice del punto
+                        const elevation = Math.sin(index * 0.05) * 10 + 100;
+                        
+                        // Calcular un tiempo secuencial para cada punto
+                        const pointTime = new Date(startTime.getTime() + index * 1000);
+                        
+                        return `
+                            <trkpt lat="${point.lat().toFixed(6)}" lon="${point.lng().toFixed(6)}">
+                                <ele>${elevation.toFixed(1)}</ele>
+                                <time>${pointTime.toISOString()}</time>
+                            </trkpt>
+                        `;
+                    }).join('')}
+                </trkseg>
+            </trk>
+        </gpx>
+    `;
+    
+    const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${document.getElementById('nombreCarrera').value}.gpx`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
 
         function tomarFoto() {
       navigator.mediaDevices.getUserMedia({ video: true })
