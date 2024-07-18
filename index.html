@@ -478,9 +478,12 @@
         }
 
         function exportarGPX() {
-    // Obtener la fecha y hora actual para el inicio de la ruta
     const startTime = new Date();
     
+    // Calcular la elevación mínima y máxima para crear más variación
+    const minElevation = 0;  // metros sobre el nivel del mar
+    const maxElevation = 500;  // metros sobre el nivel del mar
+
     const gpxData = `
         <gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">
             <metadata>
@@ -490,9 +493,10 @@
                 <name>${document.getElementById('nombreCarrera').value}</name>
                 <type>Running</type>
                 <trkseg>
-                    ${path.getPath().getArray().map((point, index) => {
-                        // Simular una elevación basada en el índice del punto
-                        const elevation = Math.sin(index * 0.05) * 10 + 100;
+                    ${path.getPath().getArray().map((point, index, array) => {
+                        // Crear una elevación más variada
+                        const progress = index / (array.length - 1);
+                        const elevation = minElevation + (Math.sin(progress * Math.PI) * (maxElevation - minElevation));
                         
                         // Calcular un tiempo secuencial para cada punto
                         const pointTime = new Date(startTime.getTime() + index * 1000);
