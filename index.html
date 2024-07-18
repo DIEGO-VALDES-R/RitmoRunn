@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RunnersPace Pro</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -25,9 +23,9 @@
         }
         .card {
             background-color: #fff;
-            border-radius: 20px;
+            border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 10px;
+            padding: 20px;
             margin-bottom: 20px;
         }
         input, button {
@@ -98,30 +96,18 @@
         }
         footer {
             text-align: center;
-            margin: 10px auto 0;
-            padding: 0,5px;
+            margin-top: 5px;
+            padding: 5px;
             background-color: #112075;
             color: white;
-            border-radius: 20px;
-            font-size: 1em;
-            max-width: 90%;
-        }
-        #creator-info {
-            position: static;
-            background-color: #112075;
-            color: white;
-            padding: 5px 0;
-            text-align: center;
-            font-size: 0.8em;
-            width: 100%;
-            box-sizing: border-box;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
-    <div id="creator-info">Desarrollada por Diego Valdés</div>
     <div class="container">
         <h1>Alcanza tu ritmo</h1>
+        <h2>Versión de prueba</h2>
         <div class="card">
             <input type="text" id="nombreCarrera" placeholder="Nombre de la carrera">
             <h3>Distancia objetivo km</h3>
@@ -160,7 +146,7 @@
         <div id="carrerasGuardadas" class="card"></div>
         <div id="map"></div>
         <footer>
-            <p>Versión de Prueba</p>
+            <p>Aplicación creada por Diego Valdés</p>
         </footer>
     </div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&callback=initMap" async defer></script>
