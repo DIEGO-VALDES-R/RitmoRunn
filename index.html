@@ -480,10 +480,13 @@
         function exportarGPX() {
     const startTime = new Date();
     
-    // Calcular la elevación mínima y máxima para crear más variación
-    const minElevation = 0;  // metros sobre el nivel del mar
-    const maxElevation = 500;  // metros sobre el nivel del mar
+    // Reducir el rango de elevación para una vista más cercana
+    const baseElevation = 10;  // elevación base en metros
+    const elevationRange = 50; // rango de variación en metros
 
+    // Calcular la distancia total del recorrido
+    const totalDistance = google.maps.geometry.spherical.computeLength(path.getPath());
+    
     const gpxData = `
         <gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">
             <metadata>
@@ -494,9 +497,14 @@
                 <type>Running</type>
                 <trkseg>
                     ${path.getPath().getArray().map((point, index, array) => {
-                        // Crear una elevación más variada
-                        const progress = index / (array.length - 1);
-                        const elevation = minElevation + (Math.sin(progress * Math.PI) * (maxElevation - minElevation));
+                        // Calcular la distancia acumulada hasta este punto
+                        const distanceSoFar = google.maps.geometry.spherical.computeLength(
+                            path.getPath().getArray().slice(0, index + 1)
+                        );
+                        
+                        // Calcular la elevación basada en la distancia recorrida
+                        const progress = distanceSoFar / totalDistance;
+                        const elevation = baseElevation + (Math.sin(progress * Math.PI * 4) * elevationRange / 2);
                         
                         // Calcular un tiempo secuencial para cada punto
                         const pointTime = new Date(startTime.getTime() + index * 1000);
