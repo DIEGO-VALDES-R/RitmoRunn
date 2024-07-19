@@ -93,7 +93,7 @@
             width: auto;
             padding: 5px 10px;
             margin: 5px;
-                }
+        }
         #creator-info {
             position: static;
             background-color: #112075;
@@ -103,26 +103,16 @@
             font-size: 0.8em;
             width: 100%;
             box-sizing: border-box;
-        }footer {
+        }
+        footer {
             text-align: center;
             margin: 10px auto 0;
-            padding: 0,5px;
+            padding: 0.5px;
             background-color: #112075;
             color: white;
             border-radius: 20px;
             font-size: 1em;
             max-width: 90%;
-        }
-
-        #creator-info {
-            position: static;
-            background-color: #112075;
-            color: white;
-            padding: 5px 0;
-            text-align: center;
-            font-size: 0.8em;
-            width: 100%;
-            box-sizing: border-box;
         }
     </style>
 </head>
@@ -157,7 +147,7 @@
         <div class="card">
             <div class="button-group">
                 <button onclick="mostrarRitmosPorKm()">Analizar Ritmos</button>
-                <button onclick="exportarGPX()">Exportar Ruta GPX</button>
+                <button onclick="prepararYExportarGPX()">Exportar Ruta GPX</button>
             </div>
             <div class="button-group">
                 <button onclick="guardarCarrera()">Guardar Carrera</button>
@@ -171,7 +161,7 @@
             <p>Versión de prueba</p>
         </footer>
     </div>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&libraries=geometry&callback=initMap" async defer></script>
     <script>
         let map, marker, path;
         let startTime, endTime, timerInterval;
@@ -190,6 +180,29 @@
         let carreraGuardada = false;
         let distanciaObjetivo = 0;
         let objetivoAlcanzado = false;
+        let distanciaHastaProximoKm = 1.0;
+        let kilometrosRecorridos = 0;
+        let isRunning = false;
+        let elevationData = [];
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 15,
+            });
+            marker = new google.maps.Marker({
+                map: map,
+                title: 'Tu ubicación actual',
+            });
+            path = new google.maps.Polyline({
+                map: map,
+                path: [],
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+        }
 
         function startCountdown() {
             const counterElement = document.getElementById('counter');
@@ -233,25 +246,6 @@
             }
         }
 
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: -34.397, lng: 150.644 },
-                zoom: 15,
-            });
-            marker = new google.maps.Marker({
-                map: map,
-                title: 'Tu ubicación actual',
-            });
-            path = new google.maps.Polyline({
-                map: map,
-                path: [],
-                geodesic: true,
-                strokeColor: '#FF0000',
-                strokeOpacity: 1.0,
-                strokeWeight: 2,
-            });
-        }
-
         function iniciarCarrera() {
             if (navigator.geolocation) {
                 if (!isPaused) {
@@ -260,6 +254,8 @@
                     caloriasQuemadas = 0;
                     pausedDuration = 0;
                     document.getElementById('feedback').innerHTML = "";
+                    path.setPath([]); // Limpiar la ruta anterior
+                    elevationData = []; // Limpiar datos de elevación anteriores
                 } else {
                     pausedDuration += (new Date() - pausedTime);
                 }
@@ -274,10 +270,11 @@
                 document.getElementById('iniciarBtn').classList.add('active');
                 document.getElementById('pausarBtn').classList.remove('active');
                 document.getElementById('pausarBtn').textContent = 'Pausar Carrera';
+                isRunning = true;
             } else {
                 alert("La geolocalización no es soportada por este navegador.");
             }
-                  }
+        }
 
         function pausarReanudarCarrera() {
             if (!isPaused) {
@@ -291,6 +288,7 @@
                 document.getElementById('pausarBtn').textContent = 'Reanudar Carrera';
                 document.getElementById('pausarBtn').classList.add('active');
                 document.getElementById('iniciarBtn').classList.remove('active');
+                isRunning = false;
             } else {
                 iniciarCarrera();
             }
@@ -303,13 +301,14 @@
             if (navigator.geolocation) {
                 navigator.geolocation.clearWatch(watchID);
             }
+            isRunning = false;
             mostrarResultados();
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoFinal = calcularRitmoPromedio();
             if (ritmoFinal <= ritmoObjetivo) {
-            mostrarMensaje(`¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'achieved');
+                mostrarMensaje(`¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'achieved');
             } else {
-            mostrarMensaje(`No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'not-achieved');
+                mostrarMensaje(`No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'not-achieved');
             }
         }
 
@@ -332,20 +331,10 @@
             document.getElementById('tiempoObjetivoHoras').value = "0";
             document.getElementById('tiempoObjetivoMinutos').value = "0";
             document.getElementById('nombreCarrera').value = "";
-            objetivoAlcanzado = false; // resetea el estado del objetivo alcanzado
-            distanciaRecorrida = 0; // resetea la distancia recorrida
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: -34.397, lng: 150.644 },
-                zoom: 15,
-            });
-            path = new google.maps.Polyline({
-                map: map,
-                path: [],
-                geodesic: true,
-                strokeColor: '#FF0000',
-                strokeOpacity: 1.0,
-                strokeWeight: 2,
-            });
+            objetivoAlcanzado = false;
+            distanciaRecorrida = 0;
+            path.setPath([]);
+            elevationData = [];
             clearInterval(timerInterval);
             clearInterval(intervalID);
             if (navigator.geolocation) {
@@ -359,19 +348,20 @@
             document.getElementById('iniciarBtn').classList.remove('active');
             document.getElementById('pausarBtn').classList.remove('active');
             document.getElementById('pausarBtn').textContent = 'Pausar Carrera';
-            carreraGuardada = false; // Resetear el estado guardado
+            carreraGuardada = false;
+            isRunning = false;
         }
-        
+
         function actualizarDistancia(nuevaDistancia) {
-        distanciaRecorrida += nuevaDistancia;
-    
-        if (!objetivoAlcanzado && distanciaRecorrida >= distanciaObjetivo) {
-        objetivoAlcanzado = true;
-        const utterance = new SpeechSynthesisUtterance(`Has completado tu distancia objetivo de ${distanciaObjetivo} kilómetros.`);
-        speechSynthesis.speak(utterance);
-    }
-}
+            distanciaRecorrida += nuevaDistancia;
         
+            if (!objetivoAlcanzado && distanciaRecorrida >= distanciaObjetivo) {
+                objetivoAlcanzado = true;
+                const utterance = new SpeechSynthesisUtterance(`Has completado tu distancia objetivo de ${distanciaObjetivo} kilómetros.`);
+                speechSynthesis.speak(utterance);
+            }
+        }
+
         function updateLocation(position) {
             const { latitude, longitude } = position.coords;
             const currentLocation = new google.maps.LatLng(latitude, longitude);
@@ -380,10 +370,12 @@
             marker.setPosition(currentLocation);
             if (path.getPath().getLength() > 1) {
                 const previousLocation = path.getPath().getAt(path.getPath().getLength() - 2);
-                distanciaRecorrida += google.maps.geometry.spherical.computeDistanceBetween(previousLocation, currentLocation) / 1000;
-                console.log(`Distancia Recorrida: ${distanciaRecorrida}`);
+                const newDistance = google.maps.geometry.spherical.computeDistanceBetween(previousLocation, currentLocation) / 1000;
+                distanciaRecorrida += newDistance;
                 caloriasQuemadas = distanciaRecorrida * CALORIAS_POR_KM;
             }
+            // Simular datos de elevación (reemplazar con datos reales si están disponibles)
+            elevationData.push(Math.random() * 100);
             checkKmMarkers(currentLocation);
         }
 
@@ -393,7 +385,7 @@
                 kmMarkers.push(currentLocation);
                 utterance = new SpeechSynthesisUtterance(`¡Has completado ${kmMark} kilómetros!`);
                 speechSynthesis.speak(utterance);
-            }
+}
         }
 
         function handleError(error) {
@@ -428,7 +420,7 @@
 
         function calcularRitmoPromedio() {
             const elapsedTime = (new Date() - startTime - pausedDuration) / 1000 / 60; // Convertir a minutos
-            return elapsedTime / distanciaRecorrida;
+            return distanciaRecorrida > 0 ? elapsedTime / distanciaRecorrida : 0;
         }
 
         function mostrarResultados() {
@@ -444,10 +436,10 @@
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoPromedio = calcularRitmoPromedio();
             if (ritmoPromedio <= ritmoObjetivo) {
-                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así y lograrás tu obejtivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} `);
+                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así y lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
                 speechSynthesis.speak(utterance);
             } else {
-                utterance = new SpeechSynthesisUtterance(`¡Corre un poco mas rapido, si sigue así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} `);
+                utterance = new SpeechSynthesisUtterance(`¡Corre un poco más rápido, si sigues así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
                 speechSynthesis.speak(utterance);
                 ritmoAlcanzado = false;
             }
@@ -465,7 +457,7 @@
                 fecha: fechaCarrera,
                 distancia: distanciaRecorrida.toFixed(2),
                 tiempo: Math.floor((endTime - startTime - pausedDuration) / 1000 / 60),
-                ritmo: Math.floor(calcularRitmoPromedio()),
+                ritmo: calcularRitmoPromedio().toFixed(2),
                 calorias: Math.floor(caloriasQuemadas),
             };
             const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
@@ -513,85 +505,154 @@
             }
         }
 
-        function exportarGPX() {
-  if (path.getPath().getLength() === 0) {
-    alert("No hay datos de ruta para exportar.");
-    return;
-  }
+        function prepararYExportarGPX() {
+            const nombreCarrera = document.getElementById('nombreCarrera').value || 'Carrera sin nombre';
+            if (path.getPath().getLength() === 0) {
+                alert("No hay datos de ruta para exportar.");
+                return;
+            }
+            const data = {
+                nombreCarrera: nombreCarrera,
+                path: path,
+                elevationData: elevationData
+            };
+            exportarGPX(data);
+        }
 
-  const gpxHeader = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">\n  <trk>\n    <name>Carrera Exportada</name>\n    <trkseg>\n';
-  const gpxFooter = '    </trkseg>\n  </trk>\n</gpx>';
+        function exportarGPX(data) {
+            const { nombreCarrera, path, elevationData } = data;
 
-  const chunks = [];
-  chunks.push(gpxHeader);
+            if (!nombreCarrera || !path || !elevationData) {
+                console.error('Error: Datos de entrada incompletos.');
+                return;
+            }
 
-  path.getPath().forEach((point, index) => {
-    const lat = point.lat();
-    const lng = point.lng();
-    const timestamp = new Date().toISOString();
-    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-      chunks.push(`      <trkpt lat="${lat}" lon="${lng}">\n        <time>${timestamp}</time>\n      </trkpt>\n`);
-    }
-  });
+            if (path.getPath().getLength() === 0) {
+                console.error('Error: No hay datos de ruta.');
+                return;
+            }
 
-  chunks.push(gpxFooter);
+            if (elevationData.length !== path.getPath().getLength()) {
+                console.error('Error: Datos de elevación incorrectos.');
+                return;
+            }
 
-  const blob = new Blob(chunks, { type: 'application/gpx+xml' });
+            const startTime = new Date();
+            const timeIntervalPerPoint = 60; // segundos
 
-  // Usar saveAs de FileSaver.js si está disponible
-  if (window.saveAs) {
-    saveAs(blob, 'ruta.gpx');
-  } else {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'ruta.gpx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-}
-        function tomarFoto() {
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then(mediaStream => {
-          const video = document.createElement('video');
-          video.style.display = 'none';
-          document.body.appendChild(video);
-          video.srcObject = mediaStream;
-          video.play();
+            let gpxContent = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <time>${startTime.toISOString()}</time>
+  </metadata>
+  <trk>
+    <name>${escapeXml(nombreCarrera)}</name>
+    <type>Running</type>
+    <trkseg>
+`;
 
-          video.onloadedmetadata = () => {
-            const button = document.createElement('button');
-            button.textContent = 'Capturar Foto';
-            button.style.display = 'block';
-            document.body.appendChild(button);
+            const pathArray = path.getPath().getArray();
+            let distanceSoFar = 0;
 
-            button.addEventListener('click', () => {
-              const canvas = document.createElement('canvas');
-              canvas.width = video.videoWidth;
-              canvas.height = video.videoHeight;
-              const context = canvas.getContext('2d');
-              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < pathArray.length; i++) {
+                const point = pathArray[i];
+                
+                if (i > 0) {
+                    try {
+                        distanceSoFar += google.maps.geometry.spherical.computeDistanceBetween(pathArray[i-1], point);
+                    } catch (error) {
+                        console.warn('Error al calcular distancia:', error);
+                    }
+                }
 
-              const photoContainer = document.getElementById('photoContainer');
-              photoContainer.innerHTML = '';
-              const img = document.createElement('img');
-              img.src = canvas.toDataURL('image/jpeg');
-              photoContainer.appendChild(img);
+                const elevation = elevationData[i] || 0;
+                const pointTime = new Date(startTime.getTime() + i * timeIntervalPerPoint * 1000);
 
-              video.pause();
-              video.srcObject.getTracks().forEach(track => track.stop());
-              document.body.removeChild(video);
-              document.body.removeChild(button);
+                gpxContent += `    <trkpt lat="${point.lat()}" lon="${point.lng()}">
+      <ele>${elevation.toFixed(1)}</ele>
+      <time>${pointTime.toISOString()}</time>
+    </trkpt>
+`;
+            }
+
+            gpxContent += `  </trkseg>
+  </trk>
+</gpx>`;
+
+            try {
+                const blob = new Blob([gpxContent], { type: 'application/gpx+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${nombreCarrera.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.gpx`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error al exportar archivo GPX:', error);
+                alert('Error al exportar archivo GPX. Intenta nuevamente.');
+            }
+        }
+
+        function escapeXml(unsafe) {
+            return unsafe.replace(/[<>&'"]/g, function (c) {
+                switch (c) {
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '&': return '&amp;';
+                    case "'": return '&apos;';
+                    case '"': return '&quot;';
+                }
             });
-          };
-        })
-        .catch(error => {
-          console.error('Error al acceder a la cámara:', error);
-          alert('Error al acceder a la cámara. Verifica que tienes permiso para acceder y que la cámara está disponible.');
-        });
-    }
+        }
+
+        function tomarFoto() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(mediaStream => {
+                    const video = document.createElement('video');
+                    video.style.display = 'none';
+                    document.body.appendChild(video);
+                    video.srcObject = mediaStream;
+                    video.play();
+
+                    video.onloadedmetadata = () => {
+                        const button = document.createElement('button');
+                        button.textContent = 'Capturar Foto';
+                        button.style.display = 'block';
+                        document.body.appendChild(button);
+
+                        button.addEventListener('click', () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            const context = canvas.getContext('2d');
+                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                            const photoContainer = document.getElementById('photoContainer');
+                            photoContainer.innerHTML = '';
+                            const img = document.createElement('img');
+                            img.src = canvas.toDataURL('image/jpeg');
+                            photoContainer.appendChild(img);
+
+                            video.pause();
+                            video.srcObject.getTracks().forEach(track => track.stop());
+                            document.body.removeChild(video);
+                            document.body.removeChild(button);
+                        });
+                    };
+                })
+                .catch(error => {
+                    console.error('Error al acceder a la cámara:', error);
+                    alert('Error al acceder a la cámara. Verifica que tienes permiso para acceder y que la cámara está disponible.');
+                });
+        }
+
+        // Función para mostrar ritmos por kilómetro (a implementar)
+        function mostrarRitmosPorKm() {
+            alert("Funcionalidad de análisis de ritmos por kilómetro aún no implementada.");
+        }
+
     </script>
 </body>
 </html>
