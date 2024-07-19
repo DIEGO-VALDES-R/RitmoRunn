@@ -188,6 +188,8 @@
         let intervalID;
         let foto;
         let carreraGuardada = false;
+        let distanciaObjetivo = 0;
+        let objetivoAlcanzado = false;
 
         function startCountdown() {
             const counterElement = document.getElementById('counter');
@@ -330,6 +332,8 @@
             document.getElementById('tiempoObjetivoHoras').value = "0";
             document.getElementById('tiempoObjetivoMinutos').value = "0";
             document.getElementById('nombreCarrera').value = "";
+            objetivoAlcanzado = false; // resetea el estado del objetivo alcanzado
+            distanciaRecorrida = 0; // resetea la distancia recorrida
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: -34.397, lng: 150.644 },
                 zoom: 15,
@@ -357,7 +361,20 @@
             document.getElementById('pausarBtn').textContent = 'Pausar Carrera';
             carreraGuardada = false; // Resetear el estado guardado
         }
+        
+        mostrarResultados(); {
+}
 
+        function actualizarDistancia(nuevaDistancia) {
+        distanciaRecorrida += nuevaDistancia;
+    
+        if (!objetivoAlcanzado && distanciaRecorrida >= distanciaObjetivo) {
+        objetivoAlcanzado = true;
+        const utterance = new SpeechSynthesisUtterance(`Has completado tu distancia objetivo de ${distanciaObjetivo} kilómetros.`);
+        speechSynthesis.speak(utterance);
+    }
+}
+        
         function updateLocation(position) {
             const { latitude, longitude } = position.coords;
             const currentLocation = new google.maps.LatLng(latitude, longitude);
