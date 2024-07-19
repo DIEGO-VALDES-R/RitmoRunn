@@ -516,73 +516,42 @@
             }
         }
 
-        function exportarGPX(data) {
-  const { nombreCarrera, path, elevationData } = data; // Obtener datos de entrada
-
-  // Definir constantes
-  const startTime = new Date();
-  const baseElevation = 10; // Elevación base en metros
-  const elevationRange = 50; // Rango de variación de elevación en metros
-  const distancePerPoint = 100; // Distancia entre puntos en metros
-  const timeIntervalPerPoint = 60; // Intervalo de tiempo entre puntos en segundos
-
-  // Calcular la distancia total del recorrido
-  const totalDistance = google.maps.geometry.spherical.computeLength(path.getPath());
-
-  // Validar datos de elevación
-  if (!elevationData || elevationData.length !== path.getPath().length()) {
-    console.error('Error: Datos de elevación incorrectos.');
+        function exportarGPX() {
+  if (path.getPath().getLength() === 0) {
+    alert("No hay datos de ruta para exportar.");
     return;
   }
 
-  // Generar datos GPX
-  const gpxData = `
-    <gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">
-      <metadata>
-        <time>${startTime.toISOString()}</time>
-      </metadata>
-      <trk>
-        <name>${nombreCarrera}</name>
-        <type>Running</type>
-        <trkseg>
-          ${path.getPath().getArray().reduce((acc, point, index, array) => {
-            // Calcular distancia acumulada hasta este punto
-            const distanceSoFar = google.maps.geometry.spherical.computeLength(
-              path.getPath().getArray().slice(0, index + 1)
-            );
+  let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  gpx += '<gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">\n';
+  gpx += '  <trk>\n';
+  gpx += '    <name>Carrera Exportada</name>\n';
+  gpx += '    <trkseg>\n';
 
-            // Calcular la elevación
-            const elevation = elevationData[index] || baseElevation; // Usar datos reales o simulación
+  path.getPath().forEach((point, index) => {
+    const lat = point.lat();
+    const lng = point.lng();
+    const timestamp = new Date().toISOString(); // Se usa una marca de tiempo genérica. Puedes modificarla según tus necesidades.
 
-            // Calcular tiempo secuencial para cada punto
-            const pointTime = new Date(startTime.getTime() + index * timeIntervalPerPoint);
+    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      gpx += `      <trkpt lat="${lat}" lon="${lng}">\n`;
+      gpx += `        <time>${timestamp}</time>\n`;
+      gpx += '      </trkpt>\n';
+    }
+  });
 
-            // Agregar punto GPX
-            acc += `
-              <trkpt lat="${point.lat().toFixed(6)}" lon="${point.lng().toFixed(6)}">
-                <ele>${elevation.toFixed(1)}</ele>
-                <time>${pointTime.toISOString()}</time>
-              </trkpt>
-            `;
+  gpx += '    </trkseg>\n';
+  gpx += '  </trk>\n';
+  gpx += '</gpx>';
 
-            // Generar punto solo si se alcanza la distancia o el intervalo de tiempo
-            return index % Math.floor(distancePerPoint / array[0].distanceFrom(array[1])) === 0 ||
-              index === array.length - 1
-              ? acc
-              : acc;
-          }, '')}
-        </trkseg>
-      </trk>
-    </gpx>
-  `;
-
-  // Exportar archivo GPX
-  const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
+  const blob = new Blob([gpx], { type: 'application/gpx+xml' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${nombreCarrera}.gpx`;
+  a.download = 'ruta.gpx';
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
