@@ -362,8 +362,6 @@
             carreraGuardada = false; // Resetear el estado guardado
         }
         
-        mostrarResultados(); {
-
         function actualizarDistancia(nuevaDistancia) {
         distanciaRecorrida += nuevaDistancia;
     
@@ -521,39 +519,39 @@
     return;
   }
 
-  let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  gpx += '<gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">\n';
-  gpx += '  <trk>\n';
-  gpx += '    <name>Carrera Exportada</name>\n';
-  gpx += '    <trkseg>\n';
+  const gpxHeader = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">\n  <trk>\n    <name>Carrera Exportada</name>\n    <trkseg>\n';
+  const gpxFooter = '    </trkseg>\n  </trk>\n</gpx>';
+
+  const chunks = [];
+  chunks.push(gpxHeader);
 
   path.getPath().forEach((point, index) => {
     const lat = point.lat();
     const lng = point.lng();
-    const timestamp = new Date().toISOString(); // Se usa una marca de tiempo genérica. Puedes modificarla según tus necesidades.
-
+    const timestamp = new Date().toISOString();
     if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-      gpx += `      <trkpt lat="${lat}" lon="${lng}">\n`;
-      gpx += `        <time>${timestamp}</time>\n`;
-      gpx += '      </trkpt>\n';
+      chunks.push(`      <trkpt lat="${lat}" lon="${lng}">\n        <time>${timestamp}</time>\n      </trkpt>\n`);
     }
   });
 
-  gpx += '    </trkseg>\n';
-  gpx += '  </trk>\n';
-  gpx += '</gpx>';
+  chunks.push(gpxFooter);
 
-  const blob = new Blob([gpx], { type: 'application/gpx+xml' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'ruta.gpx';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  const blob = new Blob(chunks, { type: 'application/gpx+xml' });
+
+  // Usar saveAs de FileSaver.js si está disponible
+  if (window.saveAs) {
+    saveAs(blob, 'ruta.gpx');
+  } else {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ruta.gpx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 }
-
         function tomarFoto() {
       navigator.mediaDevices.getUserMedia({ video: true })
         .then(mediaStream => {
