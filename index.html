@@ -583,10 +583,10 @@ function mostrarCarrerasGuardadas() {
         carreraDiv.innerHTML = `
             <h4>${carrera.nombre}</h4>
             <p>Fecha: ${carrera.fecha}</p>
-            <p>Distancia: ${carrera.distancia} km</p>
+            <p>Distancia: ${carrera.distancia.tofixed(2)} km</p>
             <p>Tiempo: ${carrera.tiempo.toFixed(2)} min</p> <!-- Redondear a 2 decimales -->
             <p>Ritmo: ${carrera.ritmoPromedio ? carrera.ritmoPromedio.toFixed(2) : 'N/A'} min/km</p> <!-- Asegurarse de que exista -->
-            <p>Calorías: ${carrera.calorias} kcal</p>
+            <p>Calorías: ${carrera.calorias.tofiexd(2)} kcal</p>
             <button onclick="eliminarCarrera(${index})">Eliminar</button>
             <button onclick="exportarGPXGuardada(${index})">Exportar GPX</button>
         `;
