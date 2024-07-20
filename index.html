@@ -582,16 +582,17 @@ function mostrarCarrerasGuardadas() {
         carreraDiv.innerHTML = `
             <h4>${carrera.nombre}</h4>
             <p>Fecha: ${carrera.fecha}</p>
-            <p>Distancia: ${carrera.distancia.toFixed(2)} km</p>
-            <p>Tiempo: ${carrera.tiempo.toFixed(2)} min</p>
-            <p>Ritmo: ${carrera.ritmo.toFixed(2)} min/km</p>
-            <p>Calorías: ${carrera.calorias.toFixed(2)} kcal</p>
+            <p>Distancia: ${carrera.distancia} km</p>
+            <p>Tiempo: ${carrera.tiempo} min</p>
+            <p>Ritmo: ${carrera.ritmo} min/km</p>
+            <p>Calorías: ${carrera.calorias} kcal</p>
             <button onclick="eliminarCarrera(${index})">Eliminar</button>
             <button onclick="exportarGPXGuardada(${index})">Exportar GPX</button>
         `;
         contenedorCarreras.appendChild(carreraDiv);
     });
 }
+
 
 function exportarGPXGuardada(index) {
     const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
