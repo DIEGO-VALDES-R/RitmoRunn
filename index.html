@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RunnersPace Pro</title>
+    <title>Align Elements</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -13,20 +13,28 @@
             color: #333;
         }
         .container {
-            max-width: 400px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
         h1, h3 {
             text-align: center;
             color: #05233b;
+            margin-bottom: 0.1px;
         }
         .card {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+        }
+        .card {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            background-color: #f9f9f9;
         }
         input, button {
             width: 100%;
@@ -40,16 +48,18 @@
         .button-group {
             display: flex;
             justify-content: space-between;
+            gap: 10px;
         }
         .button-group button {
-            width: 48%;
+            flex: 1;
         }
         .time-input {
             display: flex;
             justify-content: space-between;
+            gap: 10px;
         }
         .time-input input {
-            width: 48%;
+            flex: 1;
         }
         button {
             background-color: #112075;
@@ -65,14 +75,19 @@
             background-color: #1de40a;
         }
         #map {
-            height: 300px;
-            width: 100%;
-            border-radius: 8px;
+            margin-top: 10px;
+            height: 150px;
+            border-radius: 25px;
             margin-top: 20px;
+            flex: 2;
         }
         #feedback {
             margin-top: 20px;
             font-weight: bold;
+            height: 150px;
+            flex: 2;
+            text-align: center;
+            border-radius: 25px;
         }
         .achieved {
             color: #4CAF50;
@@ -108,72 +123,75 @@
             text-align: center;
             margin: 10px auto 0;
             padding: 5px 0;
-            background-color: #112075;
-            color: white;
-            font-size: 0.8em;
+            background-color: hsl(66, 88%, 49%);
+            color: rgb(5, 0, 0);
+            font-size: 1em;
             position: static;
             box-sizing: border-box;
         }
-
         .modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-}
-
-    .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
-}
-
-    .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-    .close:hover,
-    .close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div id="creator-info">Desarrollada por Diego Valdés</div>
     <div class="container">
         <h1>Alcanza tu ritmo</h1>
-        <button onclick="mostrarModalDatosUsuario()">Ingresa primero tus datos</button>
-            </div>
-<div id="modalDatosUsuario" style="display:none;" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="cerrarModalDatosUsuario()">&times;</span>
-        <h3>Datos del usuario</h3>
-        <input type="number" id="userWeight" placeholder="Peso (kg)">
-        <input type="number" id="userHeight" placeholder="Estatura (cm)">
-        <input type="number" id="userAge" placeholder="Edad">
-        <select id="userSex">
-            <option value="hombre">Hombre</option>
-            <option value="mujer">Mujer</option>
-            <option value="otro">Otro</option>
-        </select>
-        <button onclick="guardarDatosUsuario()">Guardar datos</button>
+        
+<div class="container">
+    <div class="button-group">
+        <div id="map" class="card">Mapa aquí</div>
+        <div id="feedback" class="card">Información Carrera</div>
     </div>
+    <button onclick="mostrarModalDatosUsuario()">Ingresa primero tus datos</button>
 </div>
-<div id="map"class="card"></div>
+<div id="modalDatosUsuario" style="display:none;" class="modal">
+<div class="modal-content">
+<span class="close" onclick="cerrarModalDatosUsuario()">&times;</span>
+<h3>Datos del usuario</h3>
+<input type="text" id="username" placeholder="tu nombre">
+<input type="number" id="userWeight" placeholder="Peso (kg)">
+<input type="number" id="userHeight" placeholder="Estatura (cm)">
+<input type="number" id="userAge" placeholder="Edad">
+<select id="userSex">
+<option value="hombre">Hombre</option>
+<option value="mujer">Mujer</option>
+<option value="otro">Otro</option>
+</select>
+<button onclick="guardarDatosUsuario()">Guardar datos</button>
+</div>
+</div>
         <div class="card">
+            <h3>Nombra tu carrera</h3>
             <input type="text" id="nombreCarrera" placeholder="Nombre de la carrera">
             <h3>Distancia objetivo km</h3>
             <input type="number" id="distanciaObjetivo" placeholder="Distancia objetivo (km)" value="0">
@@ -196,7 +214,7 @@
                 <button onclick="nuevaCarrera()">Nueva Carrera</button>
             </div>
         </div>
-        <div id="feedback" class="card"></div>
+        
         <div class="card">
             <div class="button-group">
                 <button onclick="mostrarRitmosPorKm()">Analizar Ritmos</button>
