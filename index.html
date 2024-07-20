@@ -77,7 +77,7 @@
         #map {
             margin-top: 10px;
             height: 200px;
-            border-radius: 25px;
+            border-radius: 5px;
             margin-top: 20px;
             flex: 2;
         }
@@ -87,7 +87,7 @@
             height: 100px;
             flex: 2;
             text-align: center;
-            border-radius: 25px;
+            border-radius: 5px;
         }
         .achieved {
             color: #4CAF50;
@@ -166,11 +166,12 @@
     <div id="creator-info">Desarrollada por Diego Valdés</div>
     <div class="container">
         <h1>Alcanza tu ritmo</h1>
-        <div id="map" class="card">Mapa aquí</div>
-        
-<div class="container">
-        <div class="button-group"></div>
+            <div id="map" class="card">Mapa aquí</div>
+
+            <div class="container">
+            <div class="button-group"></div>
         <div id="feedback" class="card">Información Carrera</div>
+        
     </div>
     <button onclick="mostrarModalDatosUsuario()">Ingresa primero tus datos</button>
 </div>
@@ -224,7 +225,6 @@
                 <button onclick="guardarCarrera()">Guardar Carrera</button>
                 <button onclick="toggleCarrerasGuardadas()">Mostrar/Ocultar Carreras Guardadas</button>
             </div>
-            <button onclick="tomarFoto()">Tomar Foto</button>
             
         </div>
         <div id="carrerasGuardadas" class="card"></div>
@@ -337,6 +337,7 @@
                     timeout: 10000,
                     maximumAge: 0,
                 });
+
                 timerInterval = setInterval(updateFeedback, 1000);
                 intervalID = setInterval(checkRitmo, 30000);
                 document.getElementById('iniciarBtn').classList.add('active');
@@ -535,10 +536,10 @@
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoPromedio = calcularRitmoPromedio();
             if (ritmoPromedio <= ritmoObjetivo) {
-                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
+                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así y lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
                 speechSynthesis.speak(utterance);
             } else {
-                utterance = new SpeechSynthesisUtterance(`¡Aumenta el ritmo, si sigues así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
+                utterance = new SpeechSynthesisUtterance(`¡Corre un poco más rápido, si sigues así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
                 speechSynthesis.speak(utterance);
                 ritmoAlcanzado = false;
             }
@@ -581,10 +582,10 @@ function mostrarCarrerasGuardadas() {
         carreraDiv.innerHTML = `
             <h4>${carrera.nombre}</h4>
             <p>Fecha: ${carrera.fecha}</p>
-            <p>Distancia: ${carrera.distancia.tofixed(2)} km</p>
-            <p>Tiempo: ${carrera.tiempo.tofixed(2)} min</p>
-            <p>Ritmo: ${carrera.ritmo.tofixed(2)} min/km</p>
-            <p>Calorías: ${carrera.calorias.tofixed(2)} kcal</p>
+            <p>Distancia: ${carrera.distancia.toFixed(2)} km</p>
+            <p>Tiempo: ${carrera.tiempo.toFixed(2)} min</p>
+            <p>Ritmo: ${carrera.ritmo.toFixed(2)} min/km</p>
+            <p>Calorías: ${carrera.calorias.toFixed(2)} kcal</p>
             <button onclick="eliminarCarrera(${index})">Eliminar</button>
             <button onclick="exportarGPXGuardada(${index})">Exportar GPX</button>
         `;
