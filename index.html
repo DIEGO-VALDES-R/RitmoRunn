@@ -552,8 +552,9 @@
     if (path.getPath().getLength() > 0) {
         const carrera = {
             nombre: document.getElementById('nombreCarrera').value,
+            fecha: new Date().toLocaleString(), // Agregar la fecha
             distancia: distanciaRecorrida,
-            tiempo: new Date() - startTime - pausedDuration,
+            tiempo: (new Date() - startTime - pausedDuration)/60000,// Convertir a minutos
             calorias: caloriasQuemadas,
             ritmoPromedio: calcularRitmoPromedio(),
             ruta: path.getPath().getArray(),
@@ -571,6 +572,7 @@
     }
 }
 
+
 function mostrarCarrerasGuardadas() {
     const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
     const contenedorCarreras = document.getElementById('carrerasGuardadas');
@@ -582,8 +584,8 @@ function mostrarCarrerasGuardadas() {
             <h4>${carrera.nombre}</h4>
             <p>Fecha: ${carrera.fecha}</p>
             <p>Distancia: ${carrera.distancia} km</p>
-            <p>Tiempo: ${carrera.tiempo} min</p>
-            <p>Ritmo: ${carrera.ritmo} min/km</p>
+            <p>Tiempo: ${carrera.tiempo.toFixed(2)} min</p> <!-- Redondear a 2 decimales -->
+            <p>Ritmo: ${carrera.ritmoPromedio ? carrera.ritmoPromedio.toFixed(2) : 'N/A'} min/km</p> <!-- Asegurarse de que exista -->
             <p>Calorías: ${carrera.calorias} kcal</p>
             <button onclick="eliminarCarrera(${index})">Eliminar</button>
             <button onclick="exportarGPXGuardada(${index})">Exportar GPX</button>
