@@ -378,7 +378,7 @@
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoFinal = calcularRitmoPromedio();
             if (ritmoFinal <= ritmoObjetivo) {
-                mostrarMensaje(`¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'achieved');
+                mostrarMensaje(`¡Felicidades! tu Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'achieved');
             } else {
                 mostrarMensaje(`No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'not-achieved');
             }
@@ -535,10 +535,10 @@
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoPromedio = calcularRitmoPromedio();
             if (ritmoPromedio <= ritmoObjetivo) {
-                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así y lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
+                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
                 speechSynthesis.speak(utterance);
             } else {
-                utterance = new SpeechSynthesisUtterance(`¡Corre un poco más rápido, si sigues así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
+                utterance = new SpeechSynthesisUtterance(`¡Aumenta el ritmo, si sigues así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
                 speechSynthesis.speak(utterance);
                 ritmoAlcanzado = false;
             }
