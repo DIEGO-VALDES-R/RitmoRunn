@@ -558,7 +558,8 @@
             calorias: caloriasQuemadas,
             ritmoPromedio: calcularRitmoPromedio(),
             ruta: path.getPath().getArray(),
-            elevacion: elevationData
+            elevacion: elevationData,
+            fecha: new Date().toLocaleString()
         };
 
         let carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
@@ -583,7 +584,7 @@ function mostrarCarrerasGuardadas() {
             <h4>${carrera.nombre}</h4>
             <p>Fecha: ${carrera.fecha}</p>
             <p>Distancia: ${carrera.distancia} km</p>
-            <p>Tiempo: ${carrera.tiempo} min</p>
+            <p>Tiempo: ${carrera.tiempo/600000} min</p>
             <p>Ritmo: ${carrera.ritmo} min/km</p>
             <p>Calorías: ${carrera.calorias} kcal</p>
             <button onclick="eliminarCarrera(${index})">Eliminar</button>
@@ -592,7 +593,6 @@ function mostrarCarrerasGuardadas() {
         contenedorCarreras.appendChild(carreraDiv);
     });
 }
-
 
 function exportarGPXGuardada(index) {
     const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
