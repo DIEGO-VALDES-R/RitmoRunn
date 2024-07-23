@@ -256,7 +256,6 @@
         let kilometrosRecorridos = 0;
         let isRunning = false;
         let elevationData = [];
-        
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -473,35 +472,22 @@
         }
 
         function updateFeedback() {
-    const elapsedTime = new Date(new Date() - startTime - pausedDuration);
-    const formattedTime = elapsedTime.toLocaleTimeString('es-ES', { hour12: false, timeZone: 'UTC' });
-    document.getElementById('feedback').innerHTML = `
-        Distancia: ${distanciaRecorrida.toFixed(2)} km<br>
-        Tiempo: ${formattedTime}<br>
-        Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br>
-        Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km
-    `;
-}
+            const elapsedTime = new Date(new Date() - startTime - pausedDuration);
+            const hours = elapsedTime.getUTCHours();
+            const minutes = elapsedTime.getUTCMinutes();
+            const seconds = elapsedTime.getUTCSeconds();
+            const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km`;
+        }
 
         function calcularRitmo() {
-    const distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
-    const tiempoObjetivoHoras = parseFloat(document.getElementById('tiempoObjetivoHoras').value);
-    const tiempoObjetivoMinutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
-
-    if (isNaN(distanciaObjetivo) || isNaN(tiempoObjetivoHoras) || isNaN(tiempoObjetivoMinutos)) {
-        document.getElementById('ritmoObjetivo').innerHTML = 'Por favor, ingrese valores numéricos válidos';
-        return;
-    }
-
-    if (distanciaObjetivo <= 0) {
-        document.getElementById('ritmoObjetivo').innerHTML = 'La distancia debe ser mayor que cero';
-        return;
-    }
-
-    const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
-    const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
-    document.getElementById('ritmoObjetivo').innerHTML = `Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km`;
-}
+            const distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
+            const tiempoObjetivoHoras = parseFloat(document.getElementById('tiempoObjetivoHoras').value);
+            const tiempoObjetivoMinutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
+            const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
+            const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
+            document.getElementById('ritmoObjetivo').innerHTML = `Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km`;
+        }
 
         function calcularRitmoObjetivo() {
             const distanciaObjetivo = parseFloat(document.getElementById('distanciaObjetivo').value);
@@ -520,37 +506,19 @@
     // Peso en kg, distancia en km, tiempo en minutos
     const velocidad = distancia / (tiempo / 60); // km/h
     let mets;
-
-    if (velocidad < 6.4) {
-        mets = 6; // Caminar rápido
-    } else if (velocidad < 8) {
-        mets = 8.3; // Trotar
-    } else if (velocidad < 9.7) {
-        mets = 9; // Correr
-    } else {
-        mets = 11.5; // Correr rápido
-    }
-
-    // Factor de corrección basado en sexo y edad
-    let factor = 1;
-    if (sexo === 'mujer') {
-        factor *= 0.9;
-    }
-    if (edad > 40) {
-        factor *= 0.95;
-    }
-
-    const caloriasPorMinuto = (mets * 3.5 * peso) / 200;
-    return caloriasPorMinuto * tiempo * factor;
-}
-      function calcularCaloriasConInclinacion(peso, distancia, tiempo, sexo, edad, elevacionInicial, elevacionFinal) {
-    let calorias = calcularCaloriasQuemadas(peso, distancia, tiempo, sexo, edad);
     
-    const inclinacion = (elevacionFinal - elevacionInicial) / (distancia * 1000); // convertir distancia a metros
-    if (inclinacion > 0) {
-        // Aumentar calorías quemadas en un 10% por cada 1% de inclinación positiva
-        calorias *= (1 + (inclinacion * 10));
-    }
+    if (velocidad < 8) mets = 6;
+    else if (velocidad < 9.6) mets = 8;
+    else if (velocidad < 11.2) mets = 10;
+    else if (velocidad < 12.8) mets = 11.5;
+    else if (velocidad < 14.4) mets = 13.5;
+    else mets = 16;
+
+    let calorias = (tiempo * mets * 3.5 * peso) / 200;
+
+    // Ajuste por sexo y edad
+    if (sexo === 'mujer') calorias *= 0.9;
+    if (edad > 30) calorias *= 0.95;
 
     return calorias;
 }
