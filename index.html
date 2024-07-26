@@ -310,9 +310,9 @@ function pausarReanudarCarrera() {
     const ritmoFinal = calcularRitmoPromedio();
     let mensaje = '';
     if (ritmoFinal <= ritmoObjetivo) {
-        mensaje = `¡Felicidades! Has alcanzado tu objetivo de ritmo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`;
+        mensaje = `¡Felicidades! Has alcanzado tu objetivo de ritmo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km.`, 'achieved';
     } else {
-        mensaje = `No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`;
+        mensaje = `No alcanzaste tu ritmo objetivo. Ritmo Final: ${Math.floor(ritmoFinal)} min/km.`, 'not-achieved';
     }
     if (distanciaRecorrida >= distanciaObjetivo) {
         mensaje += ' Has alcanzado tu objetivo de distancia.';
