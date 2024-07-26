@@ -568,131 +568,59 @@ function mostrarMensaje(mensaje, clase) {
             container.style.display = 'none';
         }
     }
-     function prepararYExportarGPX(carrera = null) {
-    let rutaParaExportar, elevacionParaExportar;
-    if (carrera) {
-        rutaParaExportar = carrera.ruta;
-        elevacionParaExportar = carrera.elevacion;
-    } else {
-        rutaParaExportar = path.getPath().getArray();
-        elevacionParaExportar = elevationData;
-    }
+    function exportarGPX() {
+    const startTime = new Date();
+    
+    // Reducir el rango de elevación para una vista más cercana
+    const baseElevation = 10;  // elevación base en metros
+    const elevationRange = 50; // rango de variación en metros
 
-    let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    gpx += '<gpx version="1.1" creator="RunnersPace Pro">\n';
-    gpx += '<trk>\n<trkseg>\n';
-
-    for (let i = 0; i < rutaParaExportar.length; i++) {
-        const punto = rutaParaExportar[i];
-        gpx += `<trkpt lat="${punto.lat()}" lon="${punto.lng()}">
-        <ele>${elevacionParaExportar[i]}</ele>
-        </trkpt>\n`;
-    }
-
-    gpx += '</trkseg>\n</trk>\n</gpx>';
-
-    const blob = new Blob([gpx], {type: 'application/gpx+xml'});
+    // Calcular la distancia total del recorrido
+    const totalDistance = google.maps.geometry.spherical.computeLength(path.getPath());
+    
+    const gpxData = `
+        <gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">
+            <metadata>
+                <time>${startTime.toISOString()}</time>
+            </metadata>
+            <trk>
+                <name>${document.getElementById('nombreCarrera').value}</name>
+                <type>Running</type>
+                <trkseg>
+                    ${path.getPath().getArray().map((point, index, array) => {
+                        // Calcular la distancia acumulada hasta este punto
+                        const distanceSoFar = google.maps.geometry.spherical.computeLength(
+                            path.getPath().getArray().slice(0, index + 1)
+                        );
+                        
+                        // Calcular la elevación basada en la distancia recorrida
+                        const progress = distanceSoFar / totalDistance;
+                        const elevation = baseElevation + (Math.sin(progress * Math.PI * 4) * elevationRange / 2);
+                        
+                        // Calcular un tiempo secuencial para cada punto
+                        const pointTime = new Date(startTime.getTime() + index * 1000);
+                        
+                        return `
+                            <trkpt lat="${point.lat().toFixed(6)}" lon="${point.lng().toFixed(6)}">
+                                <ele>${elevation.toFixed(1)}</ele>
+                                <time>${pointTime.toISOString()}</time>
+                            </trkpt>
+                        `;
+                    }).join('')}
+                </trkseg>
+            </trk>
+        </gpx>
+    `;
+    
+    const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'ruta.gpx';
-    document.body.appendChild(a);
+    a.download = `${document.getElementById('nombreCarrera').value}.gpx`;
     a.click();
-    document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
 
-     function exportarGPX(data) {
-            const { nombreCarrera, path, elevationData } = data;
-
-            if (!nombreCarrera || !path || !elevationData) {
-                console.error('Error: Datos de entrada incompletos.');
-                return;
-            }
-
-            if (path.getPath().getLength() === 0) {
-                console.error('Error: No hay datos de ruta.');
-                return;
-            }
-
-            if (elevationData.length !== path.getPath().getLength()) {
-                console.error('Error: Datos de elevación incorrectos.');
-                return;
-            }
-
-            const startTime = new Date();
-            const timeIntervalPerPoint = 30; // segundos
-
-            let gpxContent = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">
-  <metadata>
-    <time>${startTime.toISOString()}</time>
-  </metadata>
-  <trk>
-    <name>${escapeXml(nombreCarrera)}</name>
-    <type>Running</type>
-    <trkseg>
-`;
-
-            const pathArray = path.getPath().getArray();
-            let distanceSoFar = 0;
-
-            for (let i = 0; i < pathArray.length; i++) {
-                const point = pathArray[i];
-                
-                if (i > 0) {
-                    try {
-                        distanceSoFar += google.maps.geometry.spherical.computeDistanceBetween(pathArray[i-1], point);
-                    } catch (error) {
-                        console.warn('Error al calcular distancia:', error);
-                    }
-                }
-
-                const elevation = elevationData[i] || 0;
-                const pointTime = new Date(startTime.getTime() + i * timeIntervalPerPoint * 1000);
-
-                gpxContent += `    <trkpt lat="${point.lat()}" lon="${point.lng()}">
-      <ele>${elevation.toFixed(1)}</ele>
-      <time>${pointTime.toISOString()}</time>
-    </trkpt>
-`;
-            }
-
-            gpxContent += `  </trkseg>
-  </trk>
-</gpx>`;
-
-            try {
-                const blob = new Blob([gpxContent], { type: 'application/gpx+xml' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${nombreCarrera.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.gpx`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                console.error('Error al exportar archivo GPX:', error);
-                alert('Error al exportar archivo GPX. Intenta nuevamente.');
-            }
-        }
-
-
-    function exportarGPXGuardada(index) {
-    const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
-    const carrera = carrerasGuardadas[index];
-    if (carrera && carrera.ruta && carrera.elevacion) {
-        const data = {
-            nombreCarrera: carrera.nombre,
-            path: new google.maps.Polyline({path: carrera.ruta}),
-            elevationData: carrera.elevacion
-        };
-        exportarGPX(data);
-    } else {
-        alert("No hay datos de ruta disponibles para esta carrera.");
-    }
-}
 
 
     function mostrarRitmosPorKm() {
@@ -720,6 +648,7 @@ function mostrarMensaje(mensaje, clase) {
         alert('Datos guardados exitosamente');
         cerrarModalDatosUsuario();
     }
+    
     function checkKmMarkers(currentLocation) {
         const currentDistance = distanciaRecorrida;
         const lastKm = Math.floor(currentDistance);
