@@ -26,7 +26,7 @@
             margin: 10px 0;
         }
         #map {
-            height: 300px; /* Altura fija reducida */
+            flex: 1;
             border-radius: 10px;
             margin-bottom: 10px;
         }
@@ -44,7 +44,7 @@
             background-color: #333;
         }
         .main-button {
-            background-color: #4CAF50;
+            background-color: #e6131d;
             border: none;
             color: white;
             padding: 10px 20px;
@@ -64,7 +64,7 @@
             margin-top: 10px;
         }
         .sub-button {
-            background-color: #008CBA;
+            background-color: #f16311;
             border: none;
             color: white;
             padding: 8px 16px;
@@ -569,114 +569,49 @@ function mostrarMensaje(mensaje, clase) {
         }
     }
      function prepararYExportarGPX(carrera = null) {
-    let rutaParaExportar, elevacionParaExportar;
-    if (carrera) {
-        rutaParaExportar = carrera.ruta;
-        elevacionParaExportar = carrera.elevacion;
-    } else {
-        rutaParaExportar = path.getPath().getArray();
-        elevacionParaExportar = elevationData;
-    }
-
-    let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    gpx += '<gpx version="1.1" creator="RunnersPace Pro">\n';
-    gpx += '<trk>\n<trkseg>\n';
-
-    for (let i = 0; i < rutaParaExportar.length; i++) {
-        const punto = rutaParaExportar[i];
-        gpx += `<trkpt lat="${punto.lat()}" lon="${punto.lng()}">
-        <ele>${elevacionParaExportar[i]}</ele>
-        </trkpt>\n`;
-    }
-
-    gpx += '</trkseg>\n</trk>\n</gpx>';
-
-    const blob = new Blob([gpx], {type: 'application/gpx+xml'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'ruta.gpx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-        function exportarGPX(data) {
-            const { nombreCarrera, path, elevationData } = data;
-
-            if (!nombreCarrera || !path || !elevationData) {
-                console.error('Error: Datos de entrada incompletos.');
-                return;
-            }
-
-            if (path.getPath().getLength() === 0) {
-                console.error('Error: No hay datos de ruta.');
-                return;
-            }
-
-            if (elevationData.length !== path.getPath().getLength()) {
-                console.error('Error: Datos de elevación incorrectos.');
-                return;
-            }
-
-            const startTime = new Date();
-            const timeIntervalPerPoint = 30; // segundos
-
-            let gpxContent = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="RunnersPace Pro" xmlns="http://www.topografix.com/GPX/1/1">
-  <metadata>
-    <time>${startTime.toISOString()}</time>
-  </metadata>
-  <trk>
-    <name>${escapeXml(nombreCarrera)}</name>
-    <type>Running</type>
-    <trkseg>
-`;
-
-            const pathArray = path.getPath().getArray();
-            let distanceSoFar = 0;
-
-            for (let i = 0; i < pathArray.length; i++) {
-                const point = pathArray[i];
-                
-                if (i > 0) {
-                    try {
-                        distanceSoFar += google.maps.geometry.spherical.computeDistanceBetween(pathArray[i-1], point);
-                    } catch (error) {
-                        console.warn('Error al calcular distancia:', error);
-                    }
-                }
-
-                const elevation = elevationData[i] || 0;
-                const pointTime = new Date(startTime.getTime() + i * timeIntervalPerPoint * 1000);
-
-                gpxContent += `    <trkpt lat="${point.lat()}" lon="${point.lng()}">
-      <ele>${elevation.toFixed(1)}</ele>
-      <time>${pointTime.toISOString()}</time>
-    </trkpt>
-`;
-            }
-
-            gpxContent += `  </trkseg>
-  </trk>
-</gpx>`;
-
-            try {
-                const blob = new Blob([gpxContent], { type: 'application/gpx+xml' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${nombreCarrera.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.gpx`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                console.error('Error al exportar archivo GPX:', error);
-                alert('Error al exportar archivo GPX. Intenta nuevamente.');
-            }
+        let rutaParaExportar, elevacionParaExportar, nombreCarrera;
+        if (carrera) {
+            rutaParaExportar = carrera.ruta;
+            elevacionParaExportar = carrera.elevacion;
+            nombreCarrera = carrera.nombre;
+        } else {
+            rutaParaExportar = path.getPath().getArray();
+            elevacionParaExportar = elevationData;
+            nombreCarrera = document.getElementById('nombreCarrera').value;
         }
+
+        let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
+        gpx += '<gpx version="1.1" creator="RunnersPace Pro">\n';
+        gpx += '<trk>\n<trkseg>\n';
+
+        for (let i = 0; i < rutaParaExportar.length; i++) {
+            const punto = rutaParaExportar[i];
+            gpx += `<trkpt lat="${punto.lat()}" lon="${punto.lng()}">
+            <ele>${elevacionParaExportar[i]}</ele>
+            </trkpt>\n`;
+        }
+
+        gpx += '</trkseg>\n</trk>\n</gpx>';
+
+        const blob = new Blob([gpx], {type: 'application/gpx+xml'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${nombreCarrera.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.gpx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    function exportarGPX() {
+        prepararYExportarGPX();
+    }
+
+    function exportarGPXGuardada(index) {
+        const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
+        const carrera = carrerasGuardadas[index];
+        prepararYExportarGPX(carrera);
+    }
 
     function mostrarRitmosPorKm() {
         alert("Funcionalidad de análisis de ritmos por kilómetro aún no implementada.");
@@ -759,3 +694,4 @@ function mostrarMensaje(mensaje, clase) {
     </script>
 </body>
 </html>
+
