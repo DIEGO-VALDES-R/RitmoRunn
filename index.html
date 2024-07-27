@@ -120,6 +120,8 @@
     <div id="creator-info">Desarrollada por Diego Valdés</div>
     <div class="container">
         <h1>Alcanza tu ritmo</h1>
+      <div id="map"></div>
+      <div id="feedback" class="card"></div>
         <div class="card">
             <input type="text" id="nombreCarrera" placeholder="Nombre de la carrera">
             <h3>Distancia objetivo km</h3>
@@ -143,7 +145,7 @@
                 <button onclick="nuevaCarrera()">Nueva Carrera</button>
             </div>
         </div>
-        <div id="feedback" class="card"></div>
+        
         <div class="card">
             <div class="button-group">
                 <button onclick="mostrarRitmosPorKm()">Analizar Ritmos</button>
@@ -156,7 +158,7 @@
             <button onclick="tomarFoto()">Tomar Foto</button>
         </div>
         <div id="carrerasGuardadas" class="card"></div>
-        <div id="map"></div>
+        
         <footer>
             <p>Versión de prueba</p>
         </footer>
@@ -450,47 +452,46 @@
         }
 
         function guardarCarrera() {
-            const nombreCarrera = document.getElementById('nombreCarrera').value;
-            const fechaCarrera = new Date().toLocaleString();
-            const datosCarrera = {
-                nombre: nombreCarrera,
-                fecha: fechaCarrera,
-                distancia: distanciaRecorrida.toFixed(2),
-                tiempo: Math.floor((endTime - startTime - pausedDuration) / 1000 / 60),
-                ritmo: calcularRitmoPromedio().toFixed(2),
-                calorias: Math.floor(caloriasQuemadas),
-            };
-            const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
-            carrerasGuardadas.push(datosCarrera);
-            localStorage.setItem('carrerasGuardadas', JSON.stringify(carrerasGuardadas));
-            alert('Carrera guardada exitosamente');
-            mostrarCarrerasGuardadas();
-            carreraGuardada = true;
-        }
+    if (path.getPath().getLength() > 0) {
+        const carrera = {
+            nombre: document.getElementById('nombreCarrera').value,
+            distancia: distanciaRecorrida,
+            tiempo: new Date() - startTime - pausedDuration,
+            calorias: caloriasQuemadas,
+            ritmoPromedio: calcularRitmoPromedio(),
+            ruta: path.getPath().getArray(),
+            elevacion: elevationData
+        };
 
+        let carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
+        carrerasGuardadas.push(carrera);
+        localStorage.setItem('carrerasGuardadas', JSON.stringify(carrerasGuardadas));
+
+        carreraGuardada = true;
+        alert('Carrera guardada con éxito');
+    } else {
+        alert('No hay datos de carrera para guardar');
+    }
+}
         function mostrarCarrerasGuardadas() {
-    const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
-    const container = document.getElementById('carrerasGuardadas');
-    container.innerHTML = '';
-
-    carrerasGuardadas.forEach((carrera, index) => {
-        const carreraElement = document.createElement('div');
-        carreraElement.className = 'carrera-guardada';
-        carreraElement.innerHTML = `
-            <h3>${carrera.nombre}</h3>
-            <p>Distancia: ${carrera.distancia.toFixed(2)} km</p>
-            <p>Tiempo: ${formatTime(carrera.tiempo)}</p>
-            <p>Ritmo Promedio: ${carrera.ritmoPromedio.toFixed(2)} min/km</p>
-            <button onclick="prepararYExportarGPX(${JSON.stringify(carrera)})">Exportar GPX</button>
-        `;
-        container.appendChild(carreraElement);
-    });
-}
-
-function formatTime(ms) {
-    const date = new Date(ms);
-    return `${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')}`;
-}
+            const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
+            const contenedorCarreras = document.getElementById('carrerasGuardadas');
+            contenedorCarreras.innerHTML = '';
+            carrerasGuardadas.forEach((carrera, index) => {
+                const carreraDiv = document.createElement('div');
+                carreraDiv.classList.add('carrera-guardada');
+                carreraDiv.innerHTML = `
+                    <h4>${carrera.nombre}</h4>
+                    <p>Fecha: ${carrera.fecha}</p>
+                    <p>Distancia: ${carrera.distancia} km</p>
+                    <p>Tiempo: ${carrera.tiempo} min</p>
+                    <p>Ritmo: ${carrera.ritmo} min/km</p>
+                    <p>Calorías: ${carrera.calorias} kcal</p>
+                    <button onclick="eliminarCarrera(${index})">Eliminar</button>
+                `;
+                contenedorCarreras.appendChild(carreraDiv);
+            });
+        }
 
         function eliminarCarrera(index) {
             const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
@@ -500,27 +501,48 @@ function formatTime(ms) {
         }
 
         function toggleCarrerasGuardadas() {
-    const container = document.getElementById('carrerasGuardadas');
-    if (container.style.display === 'none') {
-        container.style.display = 'block';
-        mostrarCarrerasGuardadas();
-    } else {
-        container.style.display = 'none';
-    }
-}
-        function prepararYExportarGPX() {
-            const nombreCarrera = document.getElementById('nombreCarrera').value || 'Carrera sin nombre';
-            if (path.getPath().getLength() === 0) {
-                alert("No hay datos de ruta para exportar.");
-                return;
+            const contenedorCarreras = document.getElementById('carrerasGuardadas');
+            if (contenedorCarreras.style.display === 'none' || contenedorCarreras.style.display === '') {
+                mostrarCarrerasGuardadas();
+                contenedorCarreras.style.display = 'block';
+            } else {
+                contenedorCarreras.style.display = 'none';
             }
-            const data = {
-                nombreCarrera: nombreCarrera,
-                path: path,
-                elevationData: elevationData
-            };
-            exportarGPX(data);
         }
+
+        function prepararYExportarGPX(carrera = null) {
+    let rutaParaExportar, elevacionParaExportar;
+    if (carrera) {
+        rutaParaExportar = carrera.ruta;
+        elevacionParaExportar = carrera.elevacion;
+    } else {
+        rutaParaExportar = path.getPath().getArray();
+        elevacionParaExportar = elevationData;
+    }
+
+    let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    gpx += '<gpx version="1.1" creator="RunnersPace Pro">\n';
+    gpx += '<trk>\n<trkseg>\n';
+
+    for (let i = 0; i < rutaParaExportar.length; i++) {
+        const punto = rutaParaExportar[i];
+        gpx += `<trkpt lat="${punto.lat()}" lon="${punto.lng()}">
+        <ele>${elevacionParaExportar[i]}</ele>
+        </trkpt>\n`;
+    }
+
+    gpx += '</trkseg>\n</trk>\n</gpx>';
+
+    const blob = new Blob([gpx], {type: 'application/gpx+xml'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ruta.gpx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
 
         function exportarGPX(data) {
             const { nombreCarrera, path, elevationData } = data;
