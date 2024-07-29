@@ -10,12 +10,12 @@
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #a9caeb;
+            background-color: #eef10a;
             color: #333;
-            line-height: 1.6;
+            line-height: 1;
         }
          /* Contenedor principal de la aplicación */
-        .container {
+         .container {
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
@@ -48,12 +48,13 @@
         /* Estilos para los campos de entrada y botones */
         input, button {
             width: 90%;
-            padding: 10px;
+            padding: 0px;
             margin: 10px 0;
             border: 1px solid #ddd;
             border-radius: 25px;
             box-sizing: border-box;
             font-size: 11px;
+            text-align: center;
         }
         input:focus {
             outline: none;
@@ -76,7 +77,7 @@
             width: 48%;
         }
           /* Estilos específicos para los botones */
-        button {
+          button {
             background-color: #112075;
             color: white;
             border: none;
@@ -170,19 +171,26 @@
     <div id="creator-info">Desarrollada por Diego Valdés</div>
     <!-- Contenedor principal de la aplicación -->
     <div class="container">
-        <h1>RunnersPace Pro</h1>
+        <h1>Supera tu Ritmo</h1>
         <!-- Mapa para mostrar la ruta de la carrera -->
         <div id="map"></div>
 <!-- Área para mostrar feedback durante la carrera -->
 <div class="feedback-container">
     <div id="feedback" class="card"></div>
+  
     <div id="control-buttons" style="display: none;">
       <button id="pausarBtn" onclick="pausarReanudarCarrera()">Pausar Carrera</button>
       <button id="finalizarBtn" onclick="finalizarCarrera()">Finalizar Carrera</button>
     </div>
+     </div>
+      
+     <div id="finalizar-options" style="display: none;">
+     <button onclick="guardarCarrera()">Guardar Carrera</button>
+     <button onclick="prepararYExportarGPX()">Exportar Ruta GPX</button>
   </div>
         <!-- Tarjeta para ingresar detalles de la carrera -->
         <div class="card">
+            <h3>Nombra tu Rutina o Carrera</h3>
             <input type="text" id="nombreCarrera" placeholder="Nombre de la carrera">
             <h3>Distancia objetivo (km)</h3>
             <input type="number" id="distanciaObjetivo" placeholder="Distancia objetivo (km)" value="0">
@@ -199,16 +207,12 @@
         <div class="card">
             <!-- Botones de control -->
             <div class="button-group">
-                <button id="iniciarBtn" onclick="iniciarCarrera()">Iniciar Carrera</button>
+              <button id="iniciarBtn" onclick="iniciarCarrera()">Iniciar Carrera</button>
+              <button onclick="toggleCarrerasGuardadas()">Mostrar/Ocultar Carreras Guardadas</button>
                 <div id="control-buttons" style="display: none;">
-                  <div class="button-group">
-                    <button id="pausarBtn" onclick="pausarReanudarCarrera()">Pausar Carrera</button>
-                    <button id="finalizarBtn" onclick="finalizarCarrera()">Finalizar Carrera</button>
+
                   </div>
-                </div>
-                <div id="finalizar-options" style="display: none;">
-                  <button onclick="guardarCarrera()">Guardar Carrera</button>
-                  <button onclick="prepararYExportarGPX()">Exportar Ruta GPX</button>
+
                 </div>
               </div>
       <!-- Tarjeta con opciones adicionales (análisis, exportación, guardado) -->
@@ -217,16 +221,16 @@
 
             </div>
             <div class="button-group">
-       
-                <button onclick="toggleCarrerasGuardadas()">Mostrar/Ocultar Carreras Guardadas</button>
+
+                
             </div>
-    
+         
         </div>
         <!-- Área para mostrar las carreras guardadas -->
         <div id="carrerasGuardadas" class="card"></div>
        
         <footer>
-            <p>Versión de prueba</p>
+            <p>RunnerPace PRo Versión de prueba</p>
         </footer>
     </div>
     <!-- Script de Google Maps para el mapa -->
@@ -386,9 +390,9 @@ window.addEventListener('beforeunload', function(event) {
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoFinal = calcularRitmoPromedio();
             if (ritmoFinal <= ritmoObjetivo) {
-                mostrarMensaje(¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km., 'achieved');
+                mostrarMensaje(`¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'achieved');
             } else {
-                mostrarMensaje(No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km., 'not-achieved');
+                mostrarMensaje(`No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'not-achieved');
             }
             document.getElementById('control-buttons').style.display = 'none';
             document.getElementById('finalizar-options').style.display = 'block';
@@ -439,7 +443,7 @@ window.addEventListener('beforeunload', function(event) {
         
             if (!objetivoAlcanzado && distanciaRecorrida >= distanciaObjetivo) {
                 objetivoAlcanzado = true;
-                const utterance = new SpeechSynthesisUtterance(Has completado tu distancia objetivo de ${distanciaObjetivo} kilómetros.);
+                const utterance = new SpeechSynthesisUtterance(`Has completado tu distancia objetivo de ${distanciaObjetivo} kilómetros.`);
                 speechSynthesis.speak(utterance);
             }
         }
@@ -465,13 +469,13 @@ window.addEventListener('beforeunload', function(event) {
             const kmMark = Math.floor(distanciaRecorrida);
             if (kmMarkers.length < kmMark) {
                 kmMarkers.push(currentLocation);
-                utterance = new SpeechSynthesisUtterance(¡Has completado ${kmMark} kilómetros!);
+                utterance = new SpeechSynthesisUtterance(`¡Has completado ${kmMark} kilómetros!`);
                 speechSynthesis.speak(utterance);
 }
         }
 
         function handleError(error) {
-            console.error(Error: ${error.message});
+            console.error(`Error: ${error.message}`);
         }
 
         function updateFeedback() {
@@ -479,8 +483,8 @@ window.addEventListener('beforeunload', function(event) {
             const hours = elapsedTime.getUTCHours();
             const minutes = elapsedTime.getUTCMinutes();
             const seconds = elapsedTime.getUTCSeconds();
-            const formattedTime = ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
-            document.getElementById('feedback').innerHTML = Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km;
+            const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km`;
         }
 
         function calcularRitmo() {
@@ -489,7 +493,7 @@ window.addEventListener('beforeunload', function(event) {
             const tiempoObjetivoMinutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
             const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
             const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
-            document.getElementById('ritmoObjetivo').innerHTML = Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km;
+            document.getElementById('ritmoObjetivo').innerHTML = `Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km`;
         }
 
         function calcularRitmoObjetivo() {
@@ -510,28 +514,28 @@ window.addEventListener('beforeunload', function(event) {
             const hours = elapsedTime.getUTCHours();
             const minutes = elapsedTime.getUTCMinutes();
             const seconds = elapsedTime.getUTCSeconds();
-            const formattedTime = ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
-            document.getElementById('feedback').innerHTML = Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km;
+            const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km`;
         }
 
         function checkRitmo() {
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoPromedio = calcularRitmoPromedio();
             if (ritmoPromedio <= ritmoObjetivo) {
-                utterance = new SpeechSynthesisUtterance(¡Excelente ritmo, manténte así y lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro);
+                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así y lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
                 speechSynthesis.speak(utterance);
             } else {
-                utterance = new SpeechSynthesisUtterance(¡Corre un poco más rápido, si sigues así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro);
+                utterance = new SpeechSynthesisUtterance(`¡Corre un poco más rápido, si sigues así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
                 speechSynthesis.speak(utterance);
                 ritmoAlcanzado = false;
             }
         }
 
         function mostrarMensaje(mensaje, clase) {
-            document.getElementById('feedback').innerHTML += <div class="${clase}">${mensaje}</div>;
+            document.getElementById('feedback').innerHTML += `<div class="${clase}">${mensaje}</div>`;
         }
 
-        function guardarCarrera() {
+          function guardarCarrera() {
             const nombreCarrera = document.getElementById('nombreCarrera').value;
             const fechaCarrera = new Date().toLocaleString();
             const datosCarrera = {
@@ -571,7 +575,7 @@ window.addEventListener('beforeunload', function(event) {
 
 function formatTime(ms) {
     const date = new Date(ms);
-    return ${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')};
+    return `${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')}`;
 }
 
         function eliminarCarrera(index) {
@@ -590,6 +594,7 @@ function formatTime(ms) {
         container.style.display = 'none';
     }
 }
+
         function prepararYExportarGPX() {
             const nombreCarrera = document.getElementById('nombreCarrera').value || 'Carrera sin nombre';
             if (path.getPath().getLength() === 0) {
@@ -669,7 +674,7 @@ function formatTime(ms) {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = ${nombreCarrera.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.gpx;
+                a.download = `${nombreCarrera.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.gpx`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
