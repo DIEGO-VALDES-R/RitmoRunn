@@ -190,13 +190,6 @@
                 center: { lat: -34.397, lng: 150.644 },
                 zoom: 15,
             });
-            // Agregar controles personalizados
-    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
-        document.getElementById('zoomControl')
-    );
-    map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(
-        new google.maps.Scale()
-    );
             marker = new google.maps.Marker({
                 map: map,
                 title: 'Tu ubicación actual',
@@ -507,7 +500,6 @@ function formatTime(ms) {
         }
 
         function toggleCarrerasGuardadas() {
-        console.log("toggleCarrerasGuardadas llamada");
     const container = document.getElementById('carrerasGuardadas');
     if (container.style.display === 'none') {
         container.style.display = 'block';
@@ -661,40 +653,8 @@ function formatTime(ms) {
 
         // Función para mostrar ritmos por kilómetro (a implementar)
         function mostrarRitmosPorKm() {
-    // Calcular el ritmo promedio por cada kilómetro
-    const ritmosPorKm = [];
-    let distanciaAcumulada = 0;
-    let tiempoAcumulado = 0;
-
-    for (let i = 1; i < path.getPath().getLength(); i++) {
-        const distanciaActual = google.maps.geometry.spherical.computeDistanceBetween(path.getPath().getAt(i - 1), path.getPath().getAt(i));
-        distanciaAcumulada += distanciaActual;
-        tiempoAcumulado += (new Date(timestamps[i]) - new Date(timestamps[i - 1])) / 1000 / 60; // Convertir a minutos
-
-        if (distanciaAcumulada >= 1) {
-            ritmosPorKm.push(tiempoAcumulado);
-            distanciaAcumulada = 0;
-            tiempoAcumulado = 0;
+            alert("Funcionalidad de análisis de ritmos por kilómetro aún no implementada.");
         }
-    }
-
-    // Presentar los resultados en un gráfico o tabla
-    // Utilizar una biblioteca de gráficos como Chart.js
-    const ctx = document.getElementById('myChart').getContext('2d');
-    const myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: Array.from({ length: ritmosPorKm.length }, (_, i) => `Km ${i + 1}`),
-            datasets: [{
-                label: 'Ritmo (min/km)',
-                data: ritmosPorKm,
-                borderColor: 'rgb(75, 192, 192)',
-                fill: false
-            }]
-        }
-    });
-}
-
 
     </script>
 </body>
