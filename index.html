@@ -566,6 +566,7 @@ window.addEventListener('beforeunload', function(event) {
             <p>Distancia: ${carrera.distancia.toFixed(2)} km</p>
             <p>Tiempo: ${formatTime(carrera.tiempo)}</p>
             <p>Ritmo Promedio: ${carrera.ritmoPromedio.toFixed(2)} min/km</p>
+            <button onclick="eliminarCarrera(${index})">Eliminar</button>
             <button onclick="prepararYExportarGPX(${JSON.stringify(carrera)})">Exportar GPX</button>
         `;
         container.appendChild(carreraElement);
@@ -586,10 +587,14 @@ function formatTime(ms) {
 
         function toggleCarrerasGuardadas() {
     const container = document.getElementById('carrerasGuardadas');
-    if (container.style.display === 'none') {
+    
+    /* Verifica si el contenedor está actualmente visible*/
+    if (container.style.display === 'none' || container.style.display === '') {
+        /* Si está oculto o no tiene estilo, lo muestra y llama a mostrarCarrerasGuardadas()*/
         container.style.display = 'block';
         mostrarCarrerasGuardadas();
     } else {
+        /* Si está visible, lo oculta*/
         container.style.display = 'none';
     }
 }
