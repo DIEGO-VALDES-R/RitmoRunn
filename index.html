@@ -203,12 +203,8 @@
                 strokeWeight: 2,
             });
         }
-/* Agregar el evento beforeunload*/
-window.addEventListener('beforeunload', function(event) {
-  event.preventDefault();
-  event.returnValue = '¿Estás seguro de refrescar la página? Se perderá la información actual.';
-});
-        function startCountdown() {
+        
+     function startCountdown() {
             const counterElement = document.getElementById('counter');
             let counter = 5;
             counterElement.style.display = 'flex';
@@ -659,7 +655,12 @@ function formatTime(ms) {
         function mostrarRitmosPorKm() {
             alert("Funcionalidad de análisis de ritmos por kilómetro aún no implementada.");
         }
-
+        /* Agregar el evento beforeunload*/
+window.addEventListener('beforeunload', function(event) {
+  event.preventDefault();
+  event.returnValue = '¿Estás seguro de refrescar la página? Se perderá la información actual.';
+});
+   
     </script>
 </body>
 </html>
