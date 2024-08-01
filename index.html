@@ -30,14 +30,14 @@
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-            width: 100%;
+            padding: 0.5px;
+            margin-bottom: 7px;
+            width: 60%;
         }
         input, button {
             width: 100%;
             padding: 5px;
-            margin: 5px 0;
+            margin: 3px 0;
             border: 1px solid #ddd;
             border-radius: 20px;
             box-sizing: border-box;
@@ -46,7 +46,7 @@
         label {
             font-weight: bold;
             display: block;
-            margin-top: 10px;
+            margin-top: 0.5px;
             text-align: center;
         }
         .button-group {
@@ -55,7 +55,6 @@
             justify-content: center;
             gap: 10px;
         }
-
         .button-group button {
             flex: 1 1 calc(50% - 5px);
             max-width: 200px;
@@ -156,6 +155,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
         }
         .time-input {
             width: 100%;
@@ -180,20 +186,22 @@
             <input type="text" id="nombreCarrera" placeholder="Nombre de la carrera">
             <label for="distanciaObjetivo">Distancia objetivo (km)</label>
             <input type="number" id="distanciaObjetivo" placeholder="Distancia objetivo (km)" value="0">
+            <label for="tiempoObjetivo" style="text-align: center; width: 100%;">Tiempo Objetivo</label>
             <div class="time-input">
                 <div>
-                    <label for="tiempoObjetivoHoras">Tiempo objetivo (horas)</label>
+                    <label for="tiempoObjetivoHoras">(horas)</label>
                     <input type="number" id="tiempoObjetivoHoras" placeholder="Horas" value="0">
                 </div>
                 <div>
-                    <label for="tiempoObjetivoMinutos">Tiempo objetivo (minutos)</label>
+                    <label for="tiempoObjetivoMinutos">(minutos)</label>
                     <input type="number" id="tiempoObjetivoMinutos" placeholder="Minutos" value="0">
                 </div>
             </div>
-            <button id="calcularRitmoBtn" onclick="calcularRitmo()">Calcular Ritmo</button>
-            <button id="guardarDatosBtn">Guardar</button>
+            <button id="calcularRitmoBtn" style="display: none;" onclick="calcularRitmo()">Calcular Ritmo</button>
+            <button id="guardarDatosBtn" style="display: none;">Guardar</button>
             <div id="ritmoObjetivo"></div>
         </div>
+    </div>
         <div id="datosGuardados" class="card" style="display: none;"></div>
         <div class="card">
             <div class="button-group">
@@ -219,6 +227,18 @@
     </footer>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&libraries=geometry&callback=initMap" async defer></script>
     <script>
+        document.getElementById("ingresarDatosBtn").addEventListener("click", function() {
+            var container = document.getElementById("datosCarreraContainer");
+            container.style.display = container.style.display === "none" ? "block" : "none";
+            if (container.style.display === "block") {
+                document.getElementById("calcularRitmoBtn").style.display = "block";
+                document.getElementById("guardarDatosBtn").style.display = "block";
+            } else {
+                document.getElementById("calcularRitmoBtn").style.display = "none";
+                document.getElementById("guardarDatosBtn").style.display = "none";
+            }
+        });
+
         let map, marker, path;
         let startTime, endTime, timerInterval;
         let distanciaRecorrida = 0;
@@ -451,7 +471,6 @@ function nuevaCarrera() {
             isRunning = false;
         }
 
-
         function actualizarDistancia(nuevaDistancia) {
             distanciaRecorrida += nuevaDistancia;
         
@@ -573,31 +592,55 @@ function nuevaCarrera() {
 }
 
 
+function guardarCarrera() {
+            if (path && path.getPath().getLength() > 0) {
+                const tiempoTranscurrido = new Date() - startTime - pausedDuration;
+                const carrera = {
+                    nombre: document.getElementById('nombreCarrera').value,
+                    fecha: new Date().toISOString().split('T')[0], // Guardar la fecha actual
+                    distancia: distanciaRecorrida,
+                    tiempo: tiempoTranscurrido,
+                    calorias: caloriasQuemadas,
+                    ritmoPromedio: calcularRitmoPromedio(),
+                    ruta: path.getPath().getArray(),
+                    elevacion: elevationData
+                };
+
+                let carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
+                carrerasGuardadas.push(carrera);
+                localStorage.setItem('carrerasGuardadas', JSON.stringify(carrerasGuardadas));
+
+                alert('Carrera guardada con éxito');
+            } else {
+                alert('No hay datos de carrera para guardar');
+            }
+        }
+
         function mostrarCarrerasGuardadas() {
-    const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
-    const container = document.getElementById('carrerasGuardadas');
-    container.innerHTML = '';
+            const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
+            const container = document.getElementById('carrerasGuardadas');
+            container.innerHTML = '';
 
-    if (carrerasGuardadas.length === 0) {
-        container.innerHTML = '<p>No hay carreras guardadas.</p>';
-        return;
-    }
+            if (carrerasGuardadas.length === 0) {
+                container.innerHTML = '<p>No hay carreras guardadas.</p>';
+                return;
+            }
 
-    carrerasGuardadas.forEach((carrera, index) => {
-        const carreraElement = document.createElement('div');
-        carreraElement.className = 'carrera-guardada';
-        carreraElement.innerHTML = `
-            <h3>${carrera.nombre}</h3>
-            <p>Fecha: ${carrera.fecha}</p>
-            <p>Distancia: ${carrera.distancia} km</p>
-            <p>Tiempo: ${formatTime(carrera.tiempo * 60 * 1000)}</p>
-            <p>Ritmo Promedio: ${carrera.ritmo} min/km</p>
-            <button onclick="prepararYExportarGPX(${index})">Exportar GPX</button>
-            <button onclick="eliminarCarrera(${index})">Eliminar</button>
-        `;
-        container.appendChild(carreraElement);
-    });
-}
+            carrerasGuardadas.forEach((carrera, index) => {
+                const carreraElement = document.createElement('div');
+                carreraElement.className = 'carrera-guardada';
+                carreraElement.innerHTML = `
+                    <h3>${carrera.nombre}</h3>
+                    <p>Fecha: ${carrera.fecha}</p>
+                    <p>Distancia: ${carrera.distancia} km</p>
+                    <p>Tiempo: ${formatTime(carrera.tiempo)}</p>
+                    <p>Ritmo Promedio: ${carrera.ritmoPromedio} min/km</p>
+                    <button onclick="prepararYExportarGPX(${index})">Exportar GPX</button>
+                    <button onclick="eliminarCarrera(${index})">Eliminar</button>
+                `;
+                container.appendChild(carreraElement);
+            });
+        }
 
 function formatTime(ms) {
     const date = new Date(ms);
@@ -612,15 +655,13 @@ function formatTime(ms) {
         }
 
         function toggleCarrerasGuardadas() {
-    const container = document.getElementById('carrerasGuardadas');
-    if (container.style.display === 'none') {
-        container.style.display = 'block';
-        mostrarCarrerasGuardadas();
-    } else {
-        container.style.display = 'none';
-    }
+            var container = document.getElementById("carrerasGuardadas");
+            container.style.display = container.style.display === "none" ? "block" : "none";
+            if (container.style.display === "block") {
+                mostrarCarrerasGuardadas();
+            }
 }
-        function prepararYExportarGPX() {
+function prepararYExportarGPX() {
             const nombreCarrera = document.getElementById('nombreCarrera').value || 'Carrera sin nombre';
             if (path.getPath().getLength() === 0) {
                 alert("No hay datos de ruta para exportar.");
