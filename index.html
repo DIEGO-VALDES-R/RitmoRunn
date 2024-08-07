@@ -306,9 +306,9 @@
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoFinal = calcularRitmoPromedio();
             if (ritmoFinal <= ritmoObjetivo) {
-                mostrarMensaje(`¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'achieved');
+                mostrarMensaje( 🏆 ¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km., 'achieved');
             } else {
-                mostrarMensaje(`No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'not-achieved');
+                mostrarMensaje( 😢 No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km., 'not-achieved');
             }
         }
 
@@ -357,7 +357,7 @@
         
             if (!objetivoAlcanzado && distanciaRecorrida >= distanciaObjetivo) {
                 objetivoAlcanzado = true;
-                const utterance = new SpeechSynthesisUtterance(`Has completado tu distancia objetivo de ${distanciaObjetivo} kilómetros.`);
+                const utterance = new SpeechSynthesisUtterance(Has completado tu distancia objetivo de ${distanciaObjetivo} kilómetros.);
                 speechSynthesis.speak(utterance);
             }
         }
@@ -383,13 +383,13 @@
             const kmMark = Math.floor(distanciaRecorrida);
             if (kmMarkers.length < kmMark) {
                 kmMarkers.push(currentLocation);
-                utterance = new SpeechSynthesisUtterance(`¡Has completado ${kmMark} kilómetros!`);
+                utterance = new SpeechSynthesisUtterance(¡Has completado ${kmMark} kilómetros!);
                 speechSynthesis.speak(utterance);
 }
         }
 
         function handleError(error) {
-            console.error(`Error: ${error.message}`);
+            console.error(Error: ${error.message});
         }
 
         function updateFeedback() {
@@ -397,8 +397,8 @@
             const hours = elapsedTime.getUTCHours();
             const minutes = elapsedTime.getUTCMinutes();
             const seconds = elapsedTime.getUTCSeconds();
-            const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km`;
+            const formattedTime = ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
+            document.getElementById('feedback').innerHTML = 📏 Distancia: ${distanciaRecorrida.toFixed(2)} km<br> ⏱️ Tiempo: ${formattedTime}<br> 🔥 Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> 🏃‍♂️ Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km;
         }
 
         function calcularRitmo() {
@@ -407,7 +407,7 @@
             const tiempoObjetivoMinutos = parseFloat(document.getElementById('tiempoObjetivoMinutos').value);
             const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
             const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
-            document.getElementById('ritmoObjetivo').innerHTML = `Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km`;
+            document.getElementById('ritmoObjetivo').innerHTML = Ritmo Objetivo: ${ritmoObjetivo.toFixed(2)} min/km;
         }
 
         function calcularRitmoObjetivo() {
@@ -428,25 +428,25 @@
             const hours = elapsedTime.getUTCHours();
             const minutes = elapsedTime.getUTCMinutes();
             const seconds = elapsedTime.getUTCSeconds();
-            const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            document.getElementById('feedback').innerHTML = `Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km`;
+            const formattedTime = ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
+            document.getElementById('feedback').innerHTML = 📏 Distancia: ${distanciaRecorrida.toFixed(2)} km<br> ⏱️ Tiempo: ${formattedTime}<br> 🔥 Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> 🏃‍♂️ Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km;
         }
 
         function checkRitmo() {
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoPromedio = calcularRitmoPromedio();
             if (ritmoPromedio <= ritmoObjetivo) {
-                utterance = new SpeechSynthesisUtterance(`¡Excelente ritmo, manténte así y lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
+                utterance = new SpeechSynthesisUtterance(¡Excelente ritmo, manténte así y lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro);
                 speechSynthesis.speak(utterance);
             } else {
-                utterance = new SpeechSynthesisUtterance(`¡Corre un poco más rápido, si sigues así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro`);
+                utterance = new SpeechSynthesisUtterance(¡Corre un poco más rápido, si sigues así no lograrás tu objetivo! Ritmo actual: ${ritmoPromedio.toFixed(2)} minutos por kilómetro);
                 speechSynthesis.speak(utterance);
                 ritmoAlcanzado = false;
             }
         }
 
         function mostrarMensaje(mensaje, clase) {
-            document.getElementById('feedback').innerHTML += `<div class="${clase}">${mensaje}</div>`;
+            document.getElementById('feedback').innerHTML += <div class="${clase}">${mensaje}</div>;
         }
 
         function guardarCarrera() {
@@ -459,7 +459,6 @@
                 tiempo: Math.floor((endTime - startTime - pausedDuration) / 1000 / 60),
                 ritmo: calcularRitmoPromedio().toFixed(2),
                 calorias: Math.floor(caloriasQuemadas),
-
             };
             const carrerasGuardadas = JSON.parse(localStorage.getItem('carrerasGuardadas')) || [];
             carrerasGuardadas.push(datosCarrera);
@@ -490,7 +489,7 @@
 
 function formatTime(ms) {
     const date = new Date(ms);
-    return `${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')}`;
+    return ${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')};
 }
 
         function eliminarCarrera(index) {
@@ -509,7 +508,7 @@ function formatTime(ms) {
         container.style.display = 'none';
     }
 }
-         function prepararYExportarGPX() {
+        function prepararYExportarGPX() {
             const nombreCarrera = document.getElementById('nombreCarrera').value || 'Carrera sin nombre';
             if (path.getPath().getLength() === 0) {
                 alert("No hay datos de ruta para exportar.");
@@ -588,7 +587,7 @@ function formatTime(ms) {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${nombreCarrera.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.gpx`;
+                a.download = ${nombreCarrera.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.gpx;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
