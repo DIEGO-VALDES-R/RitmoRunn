@@ -306,9 +306,9 @@
             const ritmoObjetivo = calcularRitmoObjetivo();
             const ritmoFinal = calcularRitmoPromedio();
             if (ritmoFinal <= ritmoObjetivo) {
-                mostrarMensaje( 🏆 ¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km., 'achieved');
+                mostrarMensaje(¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km., 'achieved');
             } else {
-                mostrarMensaje( 😢 No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km., 'not-achieved');
+                mostrarMensaje(No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km., 'not-achieved');
             }
         }
 
@@ -398,7 +398,7 @@
             const minutes = elapsedTime.getUTCMinutes();
             const seconds = elapsedTime.getUTCSeconds();
             const formattedTime = ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
-            document.getElementById('feedback').innerHTML = 📏 Distancia: ${distanciaRecorrida.toFixed(2)} km<br> ⏱️ Tiempo: ${formattedTime}<br> 🔥 Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> 🏃‍♂️ Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km;
+            document.getElementById('feedback').innerHTML = Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Actual: ${calcularRitmoPromedio().toFixed(2)} min/km;
         }
 
         function calcularRitmo() {
@@ -429,7 +429,7 @@
             const minutes = elapsedTime.getUTCMinutes();
             const seconds = elapsedTime.getUTCSeconds();
             const formattedTime = ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
-            document.getElementById('feedback').innerHTML = 📏 Distancia: ${distanciaRecorrida.toFixed(2)} km<br> ⏱️ Tiempo: ${formattedTime}<br> 🔥 Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> 🏃‍♂️ Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km;
+            document.getElementById('feedback').innerHTML = Distancia: ${distanciaRecorrida.toFixed(2)} km<br> Tiempo: ${formattedTime}<br> Calorías: ${caloriasQuemadas.toFixed(2)} kcal<br> Ritmo Promedio: ${calcularRitmoPromedio().toFixed(2)} min/km;
         }
 
         function checkRitmo() {
