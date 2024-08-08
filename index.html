@@ -202,7 +202,7 @@
             </div>
             <div class="fila">
                 <div class="campo">
-                    <p class="label">⏱️ Tiempo Objetivo</p>
+                    <p class="label">⏱️ Tiempo Objetivo Hrs  -   Min</p>
                     <div class="time-input">
                         <input type="number" id="tiempoObjetivoHoras" placeholder="Horas" value="0" class="dato-carrera">
                         <input type="number" id="tiempoObjetivoMinutos" placeholder="Minutos" value="0" class="dato-carrera">
@@ -490,7 +490,7 @@
             const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
             const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
             document.getElementById('ritmoObjetivo').innerHTML = `🏃‍ ${ritmoObjetivo.toFixed(2)} min/km`;
-            speak(`Tu ritmo objetivo es ${ritmoObjetivo.toFixed(2)} minutos por kilómetro`);
+            speak(`Tu ritmo objetivo es ${ritmoObjetivo.toFixed(2)} minutos por kilómetro, ahora puedes iniciar tu carrera`);
         }
 
         function calcularRitmoObjetivo() {
@@ -569,27 +569,33 @@
         }
 
         function mostrarCarrerasGuardadas() {
-            const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
-            carrerasGuardadasDiv.innerHTML = '';
+    const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
+    carrerasGuardadasDiv.innerHTML = '';
 
-            let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
+    let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
 
-            carrerasGuardadas.forEach((carrera, index) => {
-                const carreraElement = document.createElement('div');
-                carreraElement.className = 'carrera-guardada';
-                carreraElement.innerHTML = `
-                    <h4>${carrera.nombre}</h4>
-                    <p>📏 Distancia: ${carrera.distancia} km</p>
-                    <p>⏱️ Tiempo: ${carrera.tiempo}</p>
-                    <p>🔥 Calorías: ${carrera.calorias} kcal</p>
-                    <p>🏃‍♂️ Ritmo: ${carrera.ritmo} min/km</p>
-                    <button onclick="eliminarCarrera(${index})">Eliminar</button>
-                    <button onclick="exportarGPX(${index})">Exportar GPX</button>
-                    <button onclick="compartirCarrera(${index})">Compartir</button>
-                    `;
-                carrerasGuardadasDiv.appendChild(carreraElement);
-            });
-        }
+    carrerasGuardadas.forEach((carrera, index) => {
+        const carreraElement = document.createElement('div');
+        carreraElement.className = 'carrera-guardada';
+
+        // Generar la URL de la imagen de la ruta
+        const imagenRuta = generarImagenRuta(carrera.ruta);
+
+        carreraElement.innerHTML = `
+    <h4>${carrera.nombre}</h4>
+    <p>📏 Distancia: ${carrera.distancia} km</p>
+    <p>⏱️ Tiempo: ${carrera.tiempo}</p>
+    <p>🔥 Calorías: ${carrera.calorias} kcal</p>
+    <p>🏃‍♂️ Ritmo: ${carrera.ritmo} min/km</p>
+    <img src="${imagenRuta}" alt="Ruta de la carrera" style="width: 100%; height: auto; max-width: 500px; border-radius: 8px; margin-top: 10px;">
+    <button onclick="eliminarCarrera(${index})">Eliminar</button>
+    <button onclick="exportarGPX(${index})">Exportar GPX</button>
+    <button onclick="compartirCarrera(${index})">Compartir</button>
+`;
+        carrerasGuardadasDiv.appendChild(carreraElement);
+    });
+}
+
 
     function eliminarCarrera(index) {
         let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
@@ -746,26 +752,41 @@
             alert("Funcionalidad de análisis de ritmos por kilómetro aún no implementada.");
         }
       
-      function compartirCarrera(index) {
-        let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
-        const carrera = carrerasGuardadas[index];
+        function compartirCarrera(index) {
+    let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
+    const carrera = carrerasGuardadas[index];
+    
+    // Capturar el mapa usando html2canvas
+    html2canvas(document.querySelector("#map")).then(canvas => {
+        // Convertir la captura a una imagen
+        let imagenMapa = canvas.toDataURL("image/png");
+
         const mensaje = `
             🏃‍♂️ Carrera: ${carrera.nombre}\n
             📏 Distancia: ${carrera.distancia} km\n
             ⏱️ Tiempo: ${carrera.tiempo}\n
             🔥 Calorías: ${carrera.calorias} kcal\n
-            🏃‍♂️ Ritmo: ${carrera.ritmo} min/km
+            🏃‍♂️ Ritmo: ${carrera.ritmo} min/km\n
+            🗺️ Mapa de la Ruta: Ver imagen adjunta.
         `;
+        
+        // Intentar compartir en WhatsApp con la imagen
         if (navigator.share) {
             navigator.share({
-                title: carrera.nombre,
                 text: mensaje,
-                url: window.location.href,
+                files: [new File([canvas], "mapa.png", { type: "image/png" })]
             });
         } else {
-            alert('La función de compartir no está soportada en este navegador.');
+            alert("Compartir no es soportado en este navegador.");
         }
-    }
+    });
+}
+function generarImagenRuta(ruta) {
+    const apiKey = 'AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&libraries=geometry&callback=initMapTU_API_KEY_DE_GOOGLE_MAPS';
+    const pathCoordinates = ruta.map(coord => `${coord.lat()},${coord.lng()}`).join('|');
+    
+    return `https://maps.googleapis.com/maps/api/staticmap?size=150x100&path=color:0xff0000ff|weight:5|${pathCoordinates}&key=${apiKey}`;
+}
 
     </script>
 </body>
