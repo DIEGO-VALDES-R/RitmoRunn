@@ -6,129 +6,152 @@
     <title>RunnersPace Pro</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: hsl(66, 88%, 49%);
-            color: #333;
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1, h3 {
-            text-align: center;
-            color: #05233b;
-        }
-        .card {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        input, button {
-            width: 100%;
-            padding: 5px;
-            margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        .button-group {
-            display: flex;
-            justify-content: space-between;
-        }
-        .button-group button {
-            width: 48%;
-        }
-        .time-input {
-            display: flex;
-            justify-content: space-between;
-        }
-        .time-input input {
-            width: 48%;
-        }
-        button {
-            background-color: #112075;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #f71f1f;
-        }
-        button.active {
-            background-color: #1de40a;
-        }
-        #map {
-            height: 300px;
-            width: 100%;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        #feedback {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        .achieved {
-            color: #4CAF50;
-        }
-        .not-achieved {
-            color: #F44336;
-        }
-        #carrerasGuardadas {
-            display: none;
-        }
-        .carrera-guardada {
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .carrera-guardada button {
-            width: auto;
-            padding: 5px 10px;
-            margin: 5px;
-        }
-        #creator-info {
-            position: static;
-            background-color: #112075;
-            color: white;
-            padding: 5px 0;
-            text-align: center;
-            font-size: 0.8em;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        footer {
-            position: static;
-            background-color: #112075;
-            color: white;
-            padding: 5px 0;
-            text-align: center;
-            font-size: 0.8em;
-            width: 100%;
-            box-sizing: border-box;
-            margin: 10px auto 0;
-        }
-        .datos-carrera-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem; /* Reducido el espacio entre filas */
-    padding: 1rem;
-    background-color: hsl(66, 88%, 49%);
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: hsl(60, 100%, 100%);
+    color: #635353;
+}
+
+.container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 10px; /* Reducido el padding para menor espacio */
+}
+
+h1, h3 {
+    text-align: center;
+    color: #05233b;
+}
+
+.card {
+    background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 10px; /* Reducido el padding para menor espacio */
+    margin-bottom: 10px; /* Reducido el margin-bottom para menor espacio */
+}
+
+input, button {
+    width: 100%;
+    padding: 5px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin: 0; /* Eliminar margen adicional */
+}
+
+.button-group button {
+    width: 48%;
+}
+
+.time-input {
+    display: flex;
+    justify-content: space-between;
+    gap: 0; /* Eliminar el espacio entre inputs */
+}
+
+.time-input input {
+    width: 48%;
+}
+
+button {
+    background-color: #0c1110;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #f71f1f;
+}
+
+button.active {
+    background-color: #1de40a;
+}
+
+#map {
+    height: 300px;
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 10px; /* Reducido el margen superior */
+}
+
+#feedback {
+    margin-top: 10px; /* Reducido el margen superior */
+    font-weight: bold;
+}
+
+.achieved {
+    color: #4CAF50;
+}
+
+.not-achieved {
+    color: #F44336;
+}
+
+#carrerasGuardadas {
+    display: none;
+}
+
+.carrera-guardada {
+    margin-bottom: 10px; /* Reducido el margen inferior */
+    padding: 5px; /* Reducido el padding */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.carrera-guardada button {
+    width: auto;
+    padding: 5px 10px;
+    margin: 2px; /* Reducido el margen entre botones */
+}
+
+#creator-info {
+    position: static;
+    background-color: #eff1e2;
+    color: rgb(12, 1, 1);
+    padding: 5px 0;
+    text-align: center;
+    font-size: 0.8em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+footer {
+    position: static;
+    background-color: #d61212;
+    color: white;
+    padding: 5px 0;
+    text-align: center;
+    font-size: 0.8em;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 10px auto 0;
+}
+
+.datos-carrera-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem; /* Reducido el espacio entre filas */
+    padding: 0.5rem; /* Reducido el padding */
+    background-color: hsl(60, 27%, 94%);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(170, 34, 34, 0.1);
 }
 
 .fila {
     display: flex;
     justify-content: space-between;
-    gap: 0.5rem; /* Reducido el espacio entre elementos en una fila */
+    gap: 0.25rem; /* Reducido el espacio entre elementos en una fila */
 }
 
 .campo {
@@ -140,20 +163,14 @@
 .label {
     font-size: 1rem;
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem; /* Reducido el margen inferior */
 }
 
- .dato-carrera {
+.dato-carrera {
     font-size: 1rem;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
+    padding: 0.25rem; /* Reducido el padding */
+    border: 1px solid #241a1a;
     border-radius: 4px;
-}
-
-/* Agrupando los campos de horas y minutos en una fila */
-.time-input {
-    display: flex;
-    gap: 0.5rem;
 }
 
 .btn-calcular {
@@ -175,21 +192,57 @@
     font-size: 0.875rem;
     color: #ff0000;
 }
-/* Asegura que el resultado de ritmo objetivo sea blanco */
+
 #ritmoObjetivo {
     background-color: #fff;
     color: #333;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 0.25rem; /* Reducido el padding */
+    border: 1px solid #4e4a4a;
+    border-radius: 3px;
+}
+
+.instagram-link {
+    display: inline-block;
+    text-decoration: none; /* Elimina el subrayado del enlace */
+}
+
+.instagram-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ccc;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 5px; /* Reducido el margen inferior */
+}
+
+.instagram-avatar img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+h1 {
+    margin-top: 5px; /* Reducido el margen superior */
+    margin-bottom: 0px; /* Puedes ajustar este valor para reducir espacio */
+    color: #05233b;
+    text-align: center;
 }
 </style>
 </head>
 <body>
-    <div id="creator-info">RunnersPace Pro</div>
     <div class="container">
+        
+    </div>
+</div>
+        <!-- Contenedor de la imagen de Instagram -->
+        <a href="https://www.instagram.com/tu_usuario" target="_blank" class="instagram-link">
+            <div class="instagram-avatar">
+                <img src="ruta/a/tu-imagen.jpg" alt="Instagram Avatar">
+            </div>
+        </a>
         <h1>Escoge tu Ritmo</h1>
         <div class="datos-carrera-container">
+            <div id="creator-info">RunnersPace Pro</div>
             <div class="fila">
                 <div class="campo">
                     <p class="label"><i class="fas fa-running"></i> Nombre de la Carrera</p>
@@ -214,11 +267,9 @@
                 <div id="ritmoObjetivo" class="dato-carrera">min/km</div>
             </div>
         </div>
-    <button onclick="calcularRitmo()" class="btn-calcular">Calcular Ritmo</button>
-    <div id="feedbackInicio" class="feedback"></div>
-</div>
-<div id="feedback" class="card"></div>
-        </div>
+        <button onclick="calcularRitmo()" class="btn-calcular">Calcular Ritmo</button>
+        <div id="feedbackInicio" class="feedback"></div>
+        <div id="feedback" class="card"></div>
         <div class="card">
             <div class="button-group">
                 <button id="iniciarBtn" onclick="iniciarCarrera()">Iniciar Carrera</button>
@@ -229,7 +280,6 @@
                 <button onclick="nuevaCarrera()">Nueva Carrera</button>
             </div>
         </div>
-
         <div class="card">
             <div class="button-group">
                 <button onclick="prepararYExportarGPX()">Exportar Ruta GPX</button>
@@ -239,14 +289,27 @@
         </div>
         <div id="carrerasGuardadas" class="card"></div>
         <div id="map"></div>
-        <footer>
-            <p>&copy; 2024 Diego Valdés. Todos los derechos reservados.</p>
-        </footer>
     </div>
+    <footer>
+        <p>&copy; 2024 Diego Valdés. Todos los derechos reservados.</p>
+    </footer>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&libraries=geometry&callback=initMap" async defer></script>
-<div id="map" style="width: 100%; height: 500px;"></div>
-
     <script>
+        const accessToken = 'tu_access_token'; // Reemplaza con tu token de acceso
+        const userId = 'tu_user_id'; // Reemplaza con tu ID de usuario
+
+        fetch(`https://graph.instagram.com/${userId}?fields=id,username,media_count,media&access_token=${accessToken}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // Aquí puedes usar los datos obtenidos para mostrar contenido en tu aplicación
+            })
+            .catch(error => console.error('Error:', error));
+
+        // Aquí van tus otras funciones JavaScript relacionadas con el mapa y la carrera
+    </script>
+    <script>
+
         let map, marker, path;
         let startTime, endTime, timerInterval;
         let distanciaRecorrida = 0;
@@ -268,6 +331,7 @@
         let kilometrosRecorridos = 0;
         let isRunning = false;
         let elevationData = [];
+        let tiemposYDistancias = []; // Array para almacenar tiempo y distancia recorrida
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -535,7 +599,6 @@
             document.getElementById('feedback').innerHTML += `<div class="${clase}">${mensaje}</div>`;
         }
 
-
         function guardarCarrera() {
     const nombreCarrera = document.getElementById('nombreCarrera').value;
     const tiempoTotal = new Date(new Date() - startTime - pausedDuration);
@@ -543,6 +606,9 @@
     const minutos = tiempoTotal.getUTCMinutes();
     const segundos = tiempoTotal.getUTCSeconds();
     const tiempoFormateado = `${horas}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+
+    const ritmosPorKm = calcularRitmosPorKm(); // Calcular los ritmos por kilómetro
+
     const carrera = {
         nombre: nombreCarrera,
         distancia: distanciaRecorrida.toFixed(2),
@@ -550,6 +616,7 @@
         calorias: caloriasQuemadas.toFixed(2),
         ritmo: calcularRitmoPromedio().toFixed(2),
         ruta: path.getPath().getArray(),  // Guardar la ruta completa
+        ritmosPorKm: ritmosPorKm // Añadir los ritmos por kilómetro
     };
 
     let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
@@ -562,13 +629,14 @@
 
 function toggleCarrerasGuardadas() {
     const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
-    if (carrerasGuardadasDiv.style.display === 'none') {
-        carrerasGuardadasDiv.style.display = 'block';
+    if (carrerasGuardadasDiv.style.display === 'none' || carrerasGuardadasDiv.style.display === '') {
         mostrarCarrerasGuardadas();
+        carrerasGuardadasDiv.style.display = 'block';
     } else {
         carrerasGuardadasDiv.style.display = 'none';
     }
 }
+
 
 function mostrarCarrerasGuardadas() {
     const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
@@ -579,20 +647,29 @@ function mostrarCarrerasGuardadas() {
     carrerasGuardadas.forEach((carrera, index) => {
         const carreraElement = document.createElement('div');
         carreraElement.className = 'carrera-guardada';
+
+        let ritmosPorKmHtml = '';
+        if (carrera.ritmosPorKm && carrera.ritmosPorKm.length > 0) {
+            ritmosPorKmHtml = '<h5>Ritmos por kilómetro:</h5><ul>';
+            carrera.ritmosPorKm.forEach((ritmo, km) => {
+                ritmosPorKmHtml += `<li>Kilómetro ${km + 1}: ${ritmo.toFixed(2)} min/km</li>`;
+            });
+            ritmosPorKmHtml += '</ul>';
+        }
+
         carreraElement.innerHTML = `
             <h4>${carrera.nombre}</h4>
             <p>📏 Distancia: ${carrera.distancia} km</p>
             <p>⏱️ Tiempo: ${carrera.tiempo}</p>
             <p>🔥 Calorías: ${carrera.calorias} kcal</p>
-            <p>🏃♂️ Ritmo: ${carrera.ritmo} min/km</p>
-            <div id="map${index}" class="mapa-ruta" style="width: 100%; height: 200px;"></div>
+            <p>🏃‍♂️ Ritmo: ${carrera.ritmo} min/km</p>
+            ${ritmosPorKmHtml}
             <button onclick="eliminarCarrera(${index})">Eliminar</button>
             <button onclick="exportarGPX(${index})">Exportar GPX</button>
             <button onclick="compartirCarrera(${index})">Compartir</button>
         `;
         carrerasGuardadasDiv.appendChild(carreraElement);
-    // Llamada a la función para mostrar el mapa/silueta en el div correspondiente
-        mostrarMapaRutaPequeño(`map${index}`, carrera.ruta);
+
     });
 }
 
@@ -780,31 +857,40 @@ function verMapaRuta(index) {
     let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
     const carrera = carrerasGuardadas[index];
     
-    // Capturar el mapa usando html2canvas
-    html2canvas(document.querySelector("#map")).then(canvas => {
-        // Convertir la captura a una imagen
-        let imagenMapa = canvas.toDataURL("image/png");
+    // Construir el mensaje base
+    let mensaje = `
+        🏃‍♂️ Carrera: ${carrera.nombre}\n
+        📏 Distancia: ${carrera.distancia} km\n
+        ⏱️ Tiempo: ${carrera.tiempo}\n
+        🔥 Calorías: ${carrera.calorias} kcal\n
+        🏃‍♂️ Ritmo promedio: ${carrera.ritmo} min/km\n
+    `;
 
-        const mensaje = `
-            🏃‍♂️ Carrera: ${carrera.nombre}\n
-            📏 Distancia: ${carrera.distancia} km\n
-            ⏱️ Tiempo: ${carrera.tiempo}\n
-            🔥 Calorías: ${carrera.calorias} kcal\n
-            🏃‍♂️ Ritmo: ${carrera.ritmo} min/km\n
-            🗺️ Mapa de la Ruta: Ver imagen adjunta.
-        `;
-        
-        // Intentar compartir en WhatsApp con la imagen
-        if (navigator.share) {
-            navigator.share({
-                text: mensaje,
-                files: [new File([canvas], "mapa.png", { type: "image/png" })]
-            });
-        } else {
-            alert("Compartir no es soportado en este navegador.");
-        }
-    });
+    // Agregar los ritmos por kilómetro
+    if (carrera.ritmosPorKm && carrera.ritmosPorKm.length > 0) {
+        mensaje += `\n📊 Ritmos por kilómetro:\n`;
+        carrera.ritmosPorKm.forEach((ritmo, i) => {
+            mensaje += `  Km ${i + 1}: ${ritmo} min/km\n`;
+        });
+    }
+
+    // Compartir el mensaje
+    if (navigator.share) {
+        navigator.share({
+            title: "Compartir Carrera",
+            text: mensaje,
+            url: window.location.href
+        }).then(() => {
+            console.log("Compartido exitosamente");
+        }).catch(error => {
+            console.error("Error al compartir:", error);
+        });
+    } else {
+        alert("Compartir no es soportado en este navegador.");
+    }
 }
+
+
 function generarImagenRuta(ruta) {
     const apiKey = 'AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&libraries=geometry&callback=initMapTU_API_KEY_DE_GOOGLE_MAPS';
     const pathCoordinates = ruta.map(coord => `${coord.lat()},${coord.lng()}`).join('|');
@@ -832,7 +918,35 @@ function mostrarMapaRutaPequeño(mapElementId, ruta) {
 
     path.setMap(map);
 }
+      function actualizarDistancia(nuevaDistancia) {
+    distanciaRecorrida += nuevaDistancia;
 
+    const tiempoActual = new Date(new Date() - startTime - pausedDuration).getTime() / 1000; // tiempo en segundos
+    tiemposYDistancias.push({ tiempo: tiempoActual, distancia: distanciaRecorrida });
+
+    // Verificar si se ha alcanzado un nuevo kilómetro
+    if (Math.floor(distanciaRecorrida) > tiemposYDistancias.length - 1) {
+        const kmIndex = tiemposYDistancias.length - 1;
+        const tiempoKm = tiempoActual - (tiemposYDistancias[kmIndex - 1]?.tiempo || 0);
+        const ritmoPorKm = tiempoKm / 60; // Convertir a minutos
+        tiemposYDistancias[kmIndex].ritmo = ritmoPorKm;
+    }
+
+    // Aquí irían otras actualizaciones de la interfaz, etc.
+}
+function calcularRitmosPorKm() {
+    const ritmosPorKm = [];
+
+    tiemposYDistancias.forEach((data, index) => {
+        if (index > 0) {
+            const tiempoKm = data.tiempo - tiemposYDistancias[index - 1].tiempo; // tiempo en segundos
+            const ritmoKm = tiempoKm / 60; // Convertir a minutos
+            ritmosPorKm.push(ritmoKm);
+        }
+    });
+
+    return ritmosPorKm;
+}
     </script>
 </body>
 </html>
