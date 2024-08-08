@@ -244,6 +244,8 @@
         </footer>
     </div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNoJAfM3yuVwAcmXoJ2z8whnG2-2TJPpM&libraries=geometry&callback=initMap" async defer></script>
+<div id="map" style="width: 100%; height: 500px;"></div>
+
     <script>
         let map, marker, path;
         let startTime, endTime, timerInterval;
@@ -535,68 +537,97 @@
 
 
         function guardarCarrera() {
-            const nombreCarrera = document.getElementById('nombreCarrera').value;
-            const tiempoTotal = new Date(new Date() - startTime - pausedDuration);
-            const horas = tiempoTotal.getUTCHours();
-            const minutos = tiempoTotal.getUTCMinutes();
-            const segundos = tiempoTotal.getUTCSeconds();
-            const tiempoFormateado = `${horas}:${minutos.toString().padStart(0, '0')}:${segundos.toString().padStart(0, '0')}`;
-            const carrera = {
-                nombre: nombreCarrera,
-                distancia: distanciaRecorrida.toFixed(2),
-                tiempo: tiempoFormateado,
-                calorias: caloriasQuemadas.toFixed(2),
-                ritmo: calcularRitmoPromedio().toFixed(2),
-                ruta: path.getPath().getArray(),
-            };
+    const nombreCarrera = document.getElementById('nombreCarrera').value;
+    const tiempoTotal = new Date(new Date() - startTime - pausedDuration);
+    const horas = tiempoTotal.getUTCHours();
+    const minutos = tiempoTotal.getUTCMinutes();
+    const segundos = tiempoTotal.getUTCSeconds();
+    const tiempoFormateado = `${horas}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+    const carrera = {
+        nombre: nombreCarrera,
+        distancia: distanciaRecorrida.toFixed(2),
+        tiempo: tiempoFormateado,
+        calorias: caloriasQuemadas.toFixed(2),
+        ritmo: calcularRitmoPromedio().toFixed(2),
+        ruta: path.getPath().getArray(),  // Guardar la ruta completa
+    };
 
-            let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
-            carrerasGuardadas.push(carrera);
-            localStorage.setItem('carreras', JSON.stringify(carrerasGuardadas));
+    let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
+    carrerasGuardadas.push(carrera);
+    localStorage.setItem('carreras', JSON.stringify(carrerasGuardadas));
 
-            carreraGuardada = true;
-            alert('Carrera guardada exitosamente');
-        }
+    carreraGuardada = true;
+    alert('Carrera guardada exitosamente');
+}
 
-        function toggleCarrerasGuardadas() {
-            const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
-            if (carrerasGuardadasDiv.style.display === 'none') {
-                carrerasGuardadasDiv.style.display = 'block';
-                mostrarCarrerasGuardadas();
-            } else {
-                carrerasGuardadasDiv.style.display = 'none';
-            }
-        }
-
-        function mostrarCarrerasGuardadas() {
-            const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
-            carrerasGuardadasDiv.innerHTML = '';
-
-            let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
-
-            carrerasGuardadas.forEach((carrera, index) => {
-                const carreraElement = document.createElement('div');
-                carreraElement.className = 'carrera-guardada';
-                carreraElement.innerHTML = `
-                    <h4>${carrera.nombre}</h4>
-                    <p>📏 Distancia: ${carrera.distancia} km</p>
-                    <p>⏱️ Tiempo: ${carrera.tiempo}</p>
-                    <p>🔥 Calorías: ${carrera.calorias} kcal</p>
-                    <p>🏃♂️ Ritmo: ${carrera.ritmo} min/km</p>
-                    <button onclick="eliminarCarrera(${index})">Eliminar</button>
-                    <button onclick="exportarGPX(${index})">Exportar GPX</button>
-                    <button onclick="compartirCarrera(${index})">Compartir</button>
-                    `;
-                carrerasGuardadasDiv.appendChild(carreraElement);
-            });
-        }
-
-    function eliminarCarrera(index) {
-        let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
-        carrerasGuardadas.splice(index, 1);
-        localStorage.setItem('carreras', JSON.stringify(carrerasGuardadas));
+function toggleCarrerasGuardadas() {
+    const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
+    if (carrerasGuardadasDiv.style.display === 'none') {
+        carrerasGuardadasDiv.style.display = 'block';
         mostrarCarrerasGuardadas();
+    } else {
+        carrerasGuardadasDiv.style.display = 'none';
     }
+}
+
+function mostrarCarrerasGuardadas() {
+    const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
+    carrerasGuardadasDiv.innerHTML = '';
+
+    let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
+
+    carrerasGuardadas.forEach((carrera, index) => {
+        const carreraElement = document.createElement('div');
+        carreraElement.className = 'carrera-guardada';
+        carreraElement.innerHTML = `
+            <h4>${carrera.nombre}</h4>
+            <p>📏 Distancia: ${carrera.distancia} km</p>
+            <p>⏱️ Tiempo: ${carrera.tiempo}</p>
+            <p>🔥 Calorías: ${carrera.calorias} kcal</p>
+            <p>🏃♂️ Ritmo: ${carrera.ritmo} min/km</p>
+            <div id="map${index}" class="mapa-ruta" style="width: 100%; height: 200px;"></div>
+            <button onclick="eliminarCarrera(${index})">Eliminar</button>
+            <button onclick="exportarGPX(${index})">Exportar GPX</button>
+            <button onclick="compartirCarrera(${index})">Compartir</button>
+        `;
+        carrerasGuardadasDiv.appendChild(carreraElement);
+    // Llamada a la función para mostrar el mapa/silueta en el div correspondiente
+        mostrarMapaRutaPequeño(`map${index}`, carrera.ruta);
+    });
+}
+
+function eliminarCarrera(index) {
+    let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
+    carrerasGuardadas.splice(index, 1);
+    localStorage.setItem('carreras', JSON.stringify(carrerasGuardadas));
+    mostrarCarrerasGuardadas();
+}
+
+// Nueva función para ver el mapa de la ruta
+function verMapaRuta(index) {
+    let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
+    const carrera = carrerasGuardadas[index];
+
+    const ruta = carrera.ruta.map(pos => ({ lat: pos.lat(), lng: pos.lng() }));
+
+    const mapOptions = {
+        zoom: 15,
+        center: ruta[0],  // Centrar el mapa en el primer punto de la ruta
+    };
+
+    const map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+    const path = new google.maps.Polyline({
+        path: ruta,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+    });
+
+    path.setMap(map);
+}
+
         function prepararYExportarGPX() {
             const nombreCarrera = document.getElementById('nombreCarrera').value || 'Carrera sin nombre';
             if (path.getPath().getLength() === 0) {
@@ -779,6 +810,27 @@ function generarImagenRuta(ruta) {
     const pathCoordinates = ruta.map(coord => `${coord.lat()},${coord.lng()}`).join('|');
     
     return `https://maps.googleapis.com/maps/api/staticmap?size=150x100&path=color:0xff0000ff|weight:5|${pathCoordinates}&key=${apiKey}`;
+}
+      // Función para mostrar un mapa pequeño con la silueta de la ruta
+function mostrarMapaRutaPequeño(mapElementId, ruta) {
+    const mapOptions = {
+        zoom: 15,
+        center: ruta[0],  // Centrar el mapa en el primer punto de la ruta
+        mapTypeId: google.maps.MapTypeId.TERRAIN,
+        disableDefaultUI: true, // Deshabilitar controles para simplificar la vista
+    };
+
+    const map = new google.maps.Map(document.getElementById(mapElementId), mapOptions);
+
+    const path = new google.maps.Polyline({
+        path: ruta.map(pos => ({ lat: pos.lat(), lng: pos.lng() })),
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+    });
+
+    path.setMap(map);
 }
 
     </script>
