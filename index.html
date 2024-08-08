@@ -550,11 +550,9 @@
                 ruta: path.getPath().getArray(),
             };
 
-
             let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
             carrerasGuardadas.push(carrera);
             localStorage.setItem('carreras', JSON.stringify(carrerasGuardadas));
-            console.log(JSON.parse(localStorage.getItem('carreras')));
 
             carreraGuardada = true;
             alert('Carrera guardada exitosamente');
@@ -570,35 +568,28 @@
             }
         }
 
-
         function mostrarCarrerasGuardadas() {
             const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
             carrerasGuardadasDiv.innerHTML = '';
 
             let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
-            console.log('Carreras guardadas:', carrerasGuardadas);
 
-        carrerasGuardadas.forEach((carrera, index) => {
-        const carreraElement = document.createElement('div');
-        carreraElement.className = 'carrera-guardada';
-
-        // Generar la URL de la imagen de la ruta
-        const imagenRuta = generarImagenRuta(carrera.ruta);
-
-        carreraElement.innerHTML = `
-    <h4>${carrera.nombre}</h4>
-    <p>📏 Distancia: ${carrera.distancia} km</p>
-    <p>⏱️ Tiempo: ${carrera.tiempo}</p>
-    <p>🔥 Calorías: ${carrera.calorias} kcal</p>
-    <p>🏃‍♂️ Ritmo: ${carrera.ritmo} min/km</p>
-    <img src="${imagenRuta}" alt="Ruta de la carrera" style="width: 100%; height: auto; max-width: 500px; border-radius: 8px; margin-top: 10px;">
-    <button onclick="eliminarCarrera(${index})">Eliminar</button>
-    <button onclick="exportarGPX(${index})">Exportar GPX</button>
-    <button onclick="compartirCarrera(${index})">Compartir</button>
-`;
-        carrerasGuardadasDiv.appendChild(carreraElement);
-    });
-}
+            carrerasGuardadas.forEach((carrera, index) => {
+                const carreraElement = document.createElement('div');
+                carreraElement.className = 'carrera-guardada';
+                carreraElement.innerHTML = `
+                    <h4>${carrera.nombre}</h4>
+                    <p>📏 Distancia: ${carrera.distancia} km</p>
+                    <p>⏱️ Tiempo: ${carrera.tiempo}</p>
+                    <p>🔥 Calorías: ${carrera.calorias} kcal</p>
+                    <p>🏃♂️ Ritmo: ${carrera.ritmo} min/km</p>
+                    <button onclick="eliminarCarrera(${index})">Eliminar</button>
+                    <button onclick="exportarGPX(${index})">Exportar GPX</button>
+                    <button onclick="compartirCarrera(${index})">Compartir</button>
+                    `;
+                carrerasGuardadasDiv.appendChild(carreraElement);
+            });
+        }
 
     function eliminarCarrera(index) {
         let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
@@ -606,7 +597,6 @@
         localStorage.setItem('carreras', JSON.stringify(carrerasGuardadas));
         mostrarCarrerasGuardadas();
     }
-
         function prepararYExportarGPX() {
             const nombreCarrera = document.getElementById('nombreCarrera').value || 'Carrera sin nombre';
             if (path.getPath().getLength() === 0) {
