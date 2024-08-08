@@ -550,9 +550,11 @@
                 ruta: path.getPath().getArray(),
             };
 
+
             let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
             carrerasGuardadas.push(carrera);
             localStorage.setItem('carreras', JSON.stringify(carrerasGuardadas));
+            console.log(JSON.parse(localStorage.getItem('carreras')));
 
             carreraGuardada = true;
             alert('Carrera guardada exitosamente');
@@ -568,13 +570,15 @@
             }
         }
 
+
         function mostrarCarrerasGuardadas() {
-    const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
-    carrerasGuardadasDiv.innerHTML = '';
+            const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
+            carrerasGuardadasDiv.innerHTML = '';
 
-    let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
+            let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
+            console.log('Carreras guardadas:', carrerasGuardadas);
 
-    carrerasGuardadas.forEach((carrera, index) => {
+        carrerasGuardadas.forEach((carrera, index) => {
         const carreraElement = document.createElement('div');
         carreraElement.className = 'carrera-guardada';
 
@@ -595,7 +599,6 @@
         carrerasGuardadasDiv.appendChild(carreraElement);
     });
 }
-
 
     function eliminarCarrera(index) {
         let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
