@@ -117,13 +117,14 @@ button.active {
 
 #creator-info {
     position: static;
-    background-color: #eff1e2;
-    color: rgb(12, 1, 1);
+    background-color: #d61212;
+    color: white;
     padding: 5px 0;
     text-align: center;
-    font-size: 0.8em;
+    font-size: 1em;
     width: 100%;
     box-sizing: border-box;
+    margin: 10px auto 0;
 }
 
 footer {
@@ -231,18 +232,12 @@ h1 {
 </head>
 <body>
     <div class="container">
-        
+        <div id="creator-info">RunnersPace Pro</div>
     </div>
+        <h1>Escoge tu Ritmo</h1>
 </div>
-        <!-- Contenedor de la imagen de Instagram -->
-        <a href="https://www.instagram.com/accounts/login/" target="_blank" class="instagram-link">
-    <div class="instagram-avatar">
-        <img src="ruta_a_tu_imagen.jpg" alt="Instagram Avatar">
-    </div>
-</a>
-       <h1>Escoge tu Ritmo</h1>
+</div>
         <div class="datos-carrera-container">
-            <div id="creator-info">RunnersPace Pro</div>
             <div class="fila">
                 <div class="campo">
                     <p class="label"><i class="fas fa-running"></i> Nombre de la Carrera</p>
@@ -270,6 +265,7 @@ h1 {
         <button onclick="calcularRitmo()" class="btn-calcular">Calcular Ritmo</button>
         <div id="feedbackInicio" class="feedback"></div>
         <div id="feedback" class="card"></div>
+    </div>
         <div class="card">
             <div class="button-group">
                 <button id="iniciarBtn" onclick="iniciarCarrera()">Iniciar Carrera</button>
@@ -556,7 +552,7 @@ h1 {
             const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
             const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
             document.getElementById('ritmoObjetivo').innerHTML = `🏃‍ ${ritmoObjetivo.toFixed(2)} min/km`;
-            speak(`Tu ritmo objetivo es ${ritmoObjetivo.toFixed(2)} minutos por kilómetro, ahora puedes iniciar tu carrera`);
+            speak(`¡Ya puedes iniciar tu carrera! Tu ritmo objetivo será de ${ritmoObjetivo.toFixed(2)} minutos por kilómetro`);
         }
 
         function calcularRitmoObjetivo() {
