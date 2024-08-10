@@ -552,7 +552,7 @@ h1 {
             const tiempoObjetivoTotal = tiempoObjetivoHoras * 60 + tiempoObjetivoMinutos;
             const ritmoObjetivo = tiempoObjetivoTotal / distanciaObjetivo;
             document.getElementById('ritmoObjetivo').innerHTML = `🏃‍ ${ritmoObjetivo.toFixed(2)} min/km`;
-            speak(`¡Ya puedes iniciar tu carrera! Tu ritmo objetivo será de ${ritmoObjetivo.toFixed(2)} minutos por kilómetro`);
+            speak(`Tu ritmo objetivo es ${ritmoObjetivo.toFixed(2)} minutos por kilómetro, ahora puedes iniciar tu carrera`);
         }
 
         function calcularRitmoObjetivo() {
@@ -596,31 +596,29 @@ h1 {
         }
 
         function guardarCarrera() {
-    const nombreCarrera = document.getElementById('nombreCarrera').value;
-    const tiempoTotal = new Date(new Date() - startTime - pausedDuration);
-    const horas = tiempoTotal.getUTCHours();
-    const minutos = tiempoTotal.getUTCMinutes();
-    const segundos = tiempoTotal.getUTCSeconds();
-    const tiempoFormateado = `${horas}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+    // Obtener los ritmos por kilómetro calculados
+    const ritmosPorKm = calcularRitmosPorKm();
 
-    const ritmosPorKm = calcularRitmosPorKm(); // Calcular los ritmos por kilómetro
-
-    const carrera = {
-        nombre: nombreCarrera,
+    // Crear el objeto de la carrera a guardar
+    let nuevaCarrera = {
+        nombre: document.getElementById('nombreCarrera').value || 'Sin nombre',
         distancia: distanciaRecorrida.toFixed(2),
-        tiempo: tiempoFormateado,
-        calorias: caloriasQuemadas.toFixed(2),
-        ritmo: calcularRitmoPromedio().toFixed(2),
-        ruta: path.getPath().getArray(),  // Guardar la ruta completa
-        ritmosPorKm: ritmosPorKm // Añadir los ritmos por kilómetro
+        tiempo: document.getElementById('tiempoCarrera').innerText,
+        calorias: caloriasQuemadas.toFixed(0),
+        ritmo: (distanciaRecorrida > 0) ? (tiempoTotal / 60 / distanciaRecorrida).toFixed(2) : 0,
+        ritmosPorKm: ritmosPorKm // Guardar los ritmos por kilómetro aquí
     };
 
+    // Obtener las carreras guardadas en localStorage
     let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
-    carrerasGuardadas.push(carrera);
+
+    // Agregar la nueva carrera al array de carreras guardadas
+    carrerasGuardadas.push(nuevaCarrera);
+
+    // Guardar el array actualizado en localStorage
     localStorage.setItem('carreras', JSON.stringify(carrerasGuardadas));
 
-    carreraGuardada = true;
-    alert('Carrera guardada exitosamente');
+    alert("Carrera guardada exitosamente.");
 }
 
 function toggleCarrerasGuardadas() {
@@ -632,7 +630,6 @@ function toggleCarrerasGuardadas() {
         carrerasGuardadasDiv.style.display = 'none';
     }
 }
-
 
 function mostrarCarrerasGuardadas() {
     const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
@@ -646,11 +643,10 @@ function mostrarCarrerasGuardadas() {
 
         let ritmosPorKmHtml = '';
         if (carrera.ritmosPorKm && carrera.ritmosPorKm.length > 0) {
-            ritmosPorKmHtml = '<h5>Ritmos por kilómetro:</h5><ul>';
-            carrera.ritmosPorKm.forEach((ritmo, km) => {
-                ritmosPorKmHtml += `<li>Kilómetro ${km + 1}: ${ritmo.toFixed(2)} min/km</li>`;
+            ritmosPorKmHtml += `<p>📊 Ritmos por kilómetro:</p>`;
+            carrera.ritmosPorKm.forEach((ritmo, i) => {
+                ritmosPorKmHtml += `<p>  Km ${i + 1}: ${ritmo.toFixed(2)} min/km</p>`;
             });
-            ritmosPorKmHtml += '</ul>';
         }
 
         carreraElement.innerHTML = `
@@ -665,9 +661,9 @@ function mostrarCarrerasGuardadas() {
             <button onclick="compartirCarrera(${index})">Compartir</button>
         `;
         carrerasGuardadasDiv.appendChild(carreraElement);
-
     });
 }
+
 
 function eliminarCarrera(index) {
     let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
