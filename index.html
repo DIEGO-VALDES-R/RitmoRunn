@@ -119,12 +119,12 @@ button.active {
     position: static;
     background-color: #d61212;
     color: white;
-    padding: 5px 0;
+    padding: 0px 0;
     text-align: center;
     font-size: 1em;
-    width: 100%;
+    width:100%;
     box-sizing: border-box;
-    margin: 10px auto 0;
+    margin: 0px auto 0;
 }
 
 footer {
@@ -602,15 +602,18 @@ h1 {
     // Crear el objeto de la carrera a guardar
     let nuevaCarrera = {
         nombre: document.getElementById('nombreCarrera').value || 'Sin nombre',
-        distancia: distanciaRecorrida.toFixed(2),
-        tiempo: document.getElementById('tiempoCarrera').innerText,
-        calorias: caloriasQuemadas.toFixed(0),
+        distancia: distanciaRecorrida ? distanciaRecorrida.toFixed(2) : 0,
+        tiempo: document.getElementById('tiempoCarrera') ? document.getElementById('tiempoCarrera').innerText : '00:00:00',
+        calorias: caloriasQuemadas ? caloriasQuemadas.toFixed(0) : 0,
         ritmo: (distanciaRecorrida > 0) ? (tiempoTotal / 60 / distanciaRecorrida).toFixed(2) : 0,
-        ritmosPorKm: ritmosPorKm // Guardar los ritmos por kilómetro aquí
+        ritmosPorKm: ritmosPorKm || [] // Guardar los ritmos por kilómetro aquí
     };
+
+    console.log('Carrera a guardar:', nuevaCarrera);
 
     // Obtener las carreras guardadas en localStorage
     let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
+    console.log('Carreras guardadas antes de agregar:', carrerasGuardadas);
 
     // Agregar la nueva carrera al array de carreras guardadas
     carrerasGuardadas.push(nuevaCarrera);
@@ -620,8 +623,7 @@ h1 {
 
     alert("Carrera guardada exitosamente.");
 }
-
-function toggleCarrerasGuardadas() {
+      function toggleCarrerasGuardadas() {
     const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
     if (carrerasGuardadasDiv.style.display === 'none' || carrerasGuardadasDiv.style.display === '') {
         mostrarCarrerasGuardadas();
@@ -630,14 +632,17 @@ function toggleCarrerasGuardadas() {
         carrerasGuardadasDiv.style.display = 'none';
     }
 }
-
+      
 function mostrarCarrerasGuardadas() {
+    console.log('Mostrando carreras guardadas...'); // Agregar esta línea para verificar si la función se está llamando
     const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
     carrerasGuardadasDiv.innerHTML = '';
 
     let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
+    console.log('Carreras a mostrar:', carrerasGuardadas); // Verifica si hay carreras para mostrar
 
     carrerasGuardadas.forEach((carrera, index) => {
+        console.log('Mostrando carrera:', carrera); // Verifica cada carrera
         const carreraElement = document.createElement('div');
         carreraElement.className = 'carrera-guardada';
 
@@ -663,7 +668,6 @@ function mostrarCarrerasGuardadas() {
         carrerasGuardadasDiv.appendChild(carreraElement);
     });
 }
-
 
 function eliminarCarrera(index) {
     let carrerasGuardadas = JSON.parse(localStorage.getItem('carreras')) || [];
@@ -912,20 +916,18 @@ function mostrarMapaRutaPequeño(mapElementId, ruta) {
 }
       function actualizarDistancia(nuevaDistancia) {
     distanciaRecorrida += nuevaDistancia;
+    
+    if (distanciaRecorrida >= kilometrosRecorridos + 1) {
+        kilometrosRecorridos++;
+        let tiempoActual = (new Date().getTime() - startTime - pausedDuration) / 1000; // tiempo en segundos
+        let tiempoKm = tiempoActual - (tiemposYDistancias.length > 0 ? tiemposYDistancias[tiemposYDistancias.length - 1].tiempo : 0);
+        tiemposYDistancias.push({ tiempo: tiempoActual, distancia: distanciaRecorrida });
 
-    const tiempoActual = new Date(new Date() - startTime - pausedDuration).getTime() / 1000; // tiempo en segundos
-    tiemposYDistancias.push({ tiempo: tiempoActual, distancia: distanciaRecorrida });
-
-    // Verificar si se ha alcanzado un nuevo kilómetro
-    if (Math.floor(distanciaRecorrida) > tiemposYDistancias.length - 1) {
-        const kmIndex = tiemposYDistancias.length - 1;
-        const tiempoKm = tiempoActual - (tiemposYDistancias[kmIndex - 1]?.tiempo || 0);
-        const ritmoPorKm = tiempoKm / 60; // Convertir a minutos
-        tiemposYDistancias[kmIndex].ritmo = ritmoPorKm;
+        let ritmoPorKm = tiempoKm / 60; // Convertir a minutos
+        console.log(`Ritmo del Km ${kilometrosRecorridos}: ${ritmoPorKm.toFixed(2)} min/km`);
     }
-
-    // Aquí irían otras actualizaciones de la interfaz, etc.
 }
+
 function calcularRitmosPorKm() {
     const ritmosPorKm = [];
 
