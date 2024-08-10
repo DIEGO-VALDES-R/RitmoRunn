@@ -623,7 +623,7 @@ h1 {
 
     alert("Carrera guardada exitosamente.");
 }
-      function toggleCarrerasGuardadas() {
+function toggleCarrerasGuardadas() {
     const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
     if (carrerasGuardadasDiv.style.display === 'none' || carrerasGuardadasDiv.style.display === '') {
         mostrarCarrerasGuardadas();
@@ -632,7 +632,7 @@ h1 {
         carrerasGuardadasDiv.style.display = 'none';
     }
 }
-      
+
 function mostrarCarrerasGuardadas() {
     console.log('Mostrando carreras guardadas...'); // Agregar esta línea para verificar si la función se está llamando
     const carrerasGuardadasDiv = document.getElementById('carrerasGuardadas');
@@ -916,18 +916,20 @@ function mostrarMapaRutaPequeño(mapElementId, ruta) {
 }
       function actualizarDistancia(nuevaDistancia) {
     distanciaRecorrida += nuevaDistancia;
-    
-    if (distanciaRecorrida >= kilometrosRecorridos + 1) {
-        kilometrosRecorridos++;
-        let tiempoActual = (new Date().getTime() - startTime - pausedDuration) / 1000; // tiempo en segundos
-        let tiempoKm = tiempoActual - (tiemposYDistancias.length > 0 ? tiemposYDistancias[tiemposYDistancias.length - 1].tiempo : 0);
-        tiemposYDistancias.push({ tiempo: tiempoActual, distancia: distanciaRecorrida });
 
-        let ritmoPorKm = tiempoKm / 60; // Convertir a minutos
-        console.log(`Ritmo del Km ${kilometrosRecorridos}: ${ritmoPorKm.toFixed(2)} min/km`);
+    const tiempoActual = new Date(new Date() - startTime - pausedDuration).getTime() / 1000; // tiempo en segundos
+    tiemposYDistancias.push({ tiempo: tiempoActual, distancia: distanciaRecorrida });
+
+    // Verificar si se ha alcanzado un nuevo kilómetro
+    if (Math.floor(distanciaRecorrida) > tiemposYDistancias.length - 1) {
+        const kmIndex = tiemposYDistancias.length - 1;
+        const tiempoKm = tiempoActual - (tiemposYDistancias[kmIndex - 1]?.tiempo || 0);
+        const ritmoPorKm = tiempoKm / 60; // Convertir a minutos
+        tiemposYDistancias[kmIndex].ritmo = ritmoPorKm;
     }
-}
 
+    // Aquí irían otras actualizaciones de la interfaz, etc.
+}
 function calcularRitmosPorKm() {
     const ritmosPorKm = [];
 
