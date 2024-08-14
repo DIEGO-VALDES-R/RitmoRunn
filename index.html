@@ -720,7 +720,7 @@ function toggleCarrerasGuardadas() {
             <p>Fecha: ${carrera.fecha}</p>
             <p>Distancia: ${carrera.distanciaRecorrida || '0'} km</p>
             <p>Tiempo: ${carrera.tiempoTotal || '0'} min</p>
-            <p>Ritmo: ${carrera.ritmoPromedio || '0'} min/km</p>
+            <p>Ritmo: ${carrera.ritmoPromedio || '0.00'} min/km</p>
             <p>Calorías: ${carrera.caloriasQuemadas || '0'} kcal</p>
             ${carrera.ritmosPorKm && carrera.ritmosPorKm.length > 0 ? `
                 <p>Ritmos por kilómetro:</p>
