@@ -393,7 +393,7 @@ h1 {
         let isRunning = false;
         let elevationData = [];
         let tiemposYDistancias = []; // Array para almacenar tiempo y distancia recorrida
-         
+        let tiempos = []; // Array para almacenar los tiempos en milisegundos 
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -505,22 +505,33 @@ h1 {
         }
 
         function finalizarCarrera() {
-            endTime = new Date();
-            clearInterval(timerInterval);
-            clearInterval(intervalID);
-            if (navigator.geolocation) {
-                navigator.geolocation.clearWatch(watchID);
-            }
-            isRunning = false;
-            mostrarResultados();
-            const ritmoObjetivo = calcularRitmoObjetivo();
-            const ritmoFinal = calcularRitmoPromedio();
-            if (ritmoFinal <= ritmoObjetivo) {
-                mostrarMensaje(`🏆 ¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'achieved');
-            } else {
-                mostrarMensaje(`😢 No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'not-achieved');
-            }
-        }
+    endTime = new Date();
+    clearInterval(timerInterval);
+    clearInterval(intervalID);
+    if (navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchID);
+    }
+    isRunning = false;
+    mostrarResultados();
+
+    // Calcular el ritmo objetivo y el ritmo final
+    const ritmoObjetivo = calcularRitmoObjetivo();
+    const ritmoFinal = calcularRitmoPromedio();
+
+    // Mostrar mensaje basado en el ritmo final
+    if (ritmoFinal <= ritmoObjetivo) {
+        mostrarMensaje(`🏆 ¡Felicidades! Alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'achieved');
+    } else {
+        mostrarMensaje(`😢 No alcanzaste tu ritmo objetivo. Ritmo Final: ${ritmoFinal.toFixed(2)} min/km.`, 'not-achieved');
+    }
+
+    // Calcular y mostrar los ritmos por kilómetro
+    const ritmosPorKm = calcularRitmosPorKilometro(path, tiempos);
+    console.log("Ritmos por kilómetro:", ritmosPorKm);
+
+    // Puedes agregar aquí una función para mostrar los ritmos por kilómetro en la interfaz de usuario
+    mostrarRitmosPorKilometro(ritmosPorKm);
+}
 
         function nuevaCarrera() {
             if (!carreraGuardada) {
@@ -573,21 +584,31 @@ h1 {
         }
 
         function updateLocation(position) {
-            const { latitude, longitude } = position.coords;
-            const currentLocation = new google.maps.LatLng(latitude, longitude);
-            path.getPath().push(currentLocation);
-            map.panTo(currentLocation);
-            marker.setPosition(currentLocation);
-            if (path.getPath().getLength() > 1) {
-                const previousLocation = path.getPath().getAt(path.getPath().getLength() - 2);
-                const newDistance = google.maps.geometry.spherical.computeDistanceBetween(previousLocation, currentLocation) / 1000;
-                distanciaRecorrida += newDistance;
-                caloriasQuemadas = distanciaRecorrida * CALORIAS_POR_KM;
-            }
-            // Simular datos de elevación (reemplazar con datos reales si están disponibles)
-            elevationData.push(Math.random() * 100);
-            checkKmMarkers(currentLocation);
-        }
+    const { latitude, longitude } = position.coords;
+    const currentLocation = new google.maps.LatLng(latitude, longitude);
+    
+    // Registrar el punto actual en los arrays `path` y `tiempos`
+    registrarPunto(currentLocation);
+    
+    // Actualizar el path en el mapa y mover el marcador
+    path.getPath().push(currentLocation);
+    map.panTo(currentLocation);
+    marker.setPosition(currentLocation);
+    
+    // Calcular la distancia recorrida y las calorías quemadas
+    if (path.getPath().getLength() > 1) {
+        const previousLocation = path.getPath().getAt(path.getPath().getLength() - 2);
+        const newDistance = google.maps.geometry.spherical.computeDistanceBetween(previousLocation, currentLocation) / 1000;
+        distanciaRecorrida += newDistance;
+        caloriasQuemadas = distanciaRecorrida * CALORIAS_POR_KM;
+    }
+    
+    // Simular datos de elevación (reemplazar con datos reales si están disponibles)
+    elevationData.push(Math.random() * 100);
+    
+    // Verificar los marcadores de kilómetro
+    checkKmMarkers(currentLocation);
+}
 
         function checkKmMarkers(currentLocation) {
             const kmMark = Math.floor(distanciaRecorrida);
@@ -629,11 +650,14 @@ h1 {
             return tiempoObjetivoTotal / distanciaObjetivo;
         }
 
-        function calcularRitmoPromedio() {
-            const elapsedTime = (new Date() - startTime - pausedDuration) / 1000 / 60; // Convertir a minutos
-            return distanciaRecorrida > 0 ? elapsedTime / distanciaRecorrida : 0;
-        }
-
+        function calcularRitmoPromedio(distanciaRecorrida, tiempoTotalEnSegundos) {
+    if (distanciaRecorrida > 0) {
+        let ritmoPromedio = tiempoTotalEnSegundos / 60 / distanciaRecorrida; // Minutos por kilómetro
+        return ritmoPromedio.toFixed(2); // Redondeamos a 2 decimales
+    } else {
+        return 0;
+    }
+}
 
         function mostrarResultados() {
             const elapsedTime = new Date(new Date() - startTime - pausedDuration);
@@ -1005,16 +1029,15 @@ function generarImagenRuta(ruta) {
     });
 }
 
-function calcularRitmosPorKilometro() {
+function calcularRitmosPorKilometro(path, tiempos) {
     let ritmosPorKm = [];
     let distanciaAcumulada = 0;
     let tiempoAcumuladoMs = 0;
-    const pathArray = path.getPath().getArray();
 
-    for (let i = 1; i < pathArray.length; i++) {
-        let distanciaSegmento = google.maps.geometry.spherical.computeDistanceBetween(pathArray[i-1], pathArray[i]);
-        let tiempoSegmentoMs = 1000 * 30; // Suponiendo un intervalo de 30 segundos entre puntos
-        
+    for (let i = 1; i < path.length; i++) {
+        let distanciaSegmento = google.maps.geometry.spherical.computeDistanceBetween(path[i-1], path[i]);
+        let tiempoSegmentoMs = tiempos[i] - tiempos[i-1];
+
         distanciaAcumulada += distanciaSegmento;
         tiempoAcumuladoMs += tiempoSegmentoMs;
 
@@ -1030,8 +1053,12 @@ function calcularRitmosPorKilometro() {
 
     return ritmosPorKm;
 }
-
-function actualizarInterfazUsuario(carrera) {
+        function registrarPunto(punto) {
+    path.push(punto);
+    tiempos.push(Date.now()); // Registrar el tiempo actual en milisegundos
+}
+   
+        function actualizarInterfazUsuario(carrera) {
     let resultadosHtml = `
         <div class="resultado-titulo">Mi Objetivo</div>
         <div class="resultado-datos">
